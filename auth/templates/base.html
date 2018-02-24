@@ -10,6 +10,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
   {% block head %}{% endblock head %}
+  <script>
+      // SIDEBAR
+    $(document).ready(function(){
+      $('.button-collapse').sideNav({
+          menuWidth: 300, // Default is 300
+          edge: 'left', // Choose the horizontal origin
+          closeOnClick: false, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+          draggable: true // Choose whether you can drag to open on touch screens
+        }
+      );
+    });
+  </script>
 </head>
 <body class="grey lighten-5">
 
@@ -17,23 +29,19 @@
   <nav>
     <div class="nav-wrapper grey darken-3">
       <div class="container">
-        <a class="brand-logo" href="/">GETIN {% block app_name %}{% endblock app_name %}</a>
-        <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-        <ul class="right hide-on-med-and-down">
-        {% if not current_user.is_anonymous %}
-          <li><a href="{{ url_for('logout') }}">Logout <strong>{{ current_user.name }}</strong></a></li>
-        {% elif not request.endpoint == 'login' %}
-          <li><a href={{login_url}}>Log in</a></li>
-        {% endif %}
-        </ul>
-        <ul class="side-nav" id="mobile-demo">
-        {% if not current_user.is_anonymous %}
-          <li><a href="{{ url_for('logout') }}">Logout <strong>{{ current_user.name }}</strong></a></li>
-        {% elif not request.endpoint == 'login' %}
-          <li><a href={{login_url}}>Log in</a></li>
-        {% endif %}
-        </ul>
-      </div>
+          {% if not current_user.is_anonymous %}
+            <a href="#" data-activates="slide-out" class="button-collapse show-on-large"><i class="material-icons" style="font-size: 2rem; padding-right:20px">menu</i></a>
+          {% endif %}
+          <a class="brand-logo" href="/">GETIN</a>
+          <ul class="side-nav" id="slide-out"></ul>
+          <ul class="right hide-on-med-and-down">
+          {% if not current_user.is_anonymous %}
+            <li><a href="{{ url_for('logout') }}">Logout <strong>{{ current_user.name }}</strong></a></li>
+          {% elif not request.endpoint == 'login' %}
+            <li><a href={{login_url}}>Log in</a></li>
+          {% endif %}
+          </ul>
+        </div>
     </div>
   </nav>
 </header>
