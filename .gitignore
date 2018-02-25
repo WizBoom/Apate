@@ -107,4 +107,5 @@ ENV/
 log.txt
 config.cfg
 *.db
+.db
 data.db
