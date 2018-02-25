@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from preston.esi import Preston
 
 from auth.shared import Database
-from auth.models import User
+from auth.models import *
 
 
 # -- Initialisation -- #
@@ -51,16 +51,16 @@ FlaskApplication.jinja_env.globals.update(login_url=PrestonConnection.get_author
 
 
 @LoginManager.user_loader
-def load_user(user_id):
-    """Takes a string int and returns a auth.models.User object for Flask-Login.
+def load_user(character_id):
+    """Takes a string int and returns a auth.models.Character object for Flask-Login.
 
     Args:
-        user_id (str): user model id
+        character_id (str): character model id
 
     Returns:
-        auth.models.User: user with that id
+        auth.models.Character: character with that id
     """
-    return User.query.filter_by(id=int(user_id)).first()
+    return Character.query.filter_by(id=int(character_id)).first()
 
 
 @FlaskApplication.route('/')
@@ -94,16 +94,16 @@ def eve_oauth_callback():
         return redirect(url_for('login'))
     character_info = auth.whoami()
     character_name = character_info['CharacterName']
-    user = User.query.filter_by(name=character_name).first()
-    if user:
-        login_user(user)
+    character = Character.query.filter_by(name=name).first()
+    if character:
+        login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
         flash('Logged in', 'success')
         return redirect(url_for('landing'))
-    user = User(character_name)
-    Database.session.add(user)
+    character = Character(character_name)
+    Database.session.add(character)
     Database.session.commit()
-    login_user(user)
+    login_user(character)
     FlaskApplication.logger.info('{} created an account'.format(current_user.name))
     return redirect(url_for('landing'))
 

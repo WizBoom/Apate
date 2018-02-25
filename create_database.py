@@ -1,10 +1,19 @@
 #!/usr/bin/env python
-from auth.app import db
+from auth.app import Database
 from auth.models import *
 
 
-db.drop_all()
-db.create_all()
-u = User('Alex Kommorov')
-db.session.add(u)
-db.session.commit()
+Database.drop_all()
+Database.create_all()
+character = Character('Alex Kommorov')
+Database.session.add(character)
+
+corporation = Corporation(98134538, "Wormbro", "NW0RT", "")
+Database.session.add(corporation)
+corporation.characters.append(character)
+
+alliance = Alliance(99006650, "The Society For Unethical Treatment Of Sleepers", "GETIN", "")
+Database.session.add(alliance)
+alliance.corporations.append(corporation)
+
+Database.session.commit()
