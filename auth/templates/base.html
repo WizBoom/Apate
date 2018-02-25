@@ -1,63 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GETIN Webportal</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-  {% block head %}{% endblock head %}
 </head>
-<body class="grey lighten-5">
-
+<body>
 <header>
-  <nav>
-    <div class="nav-wrapper grey darken-3">
-      <div class="container">
-        <a class="brand-logo" href="/">GETIN {% block app_name %}{% endblock app_name %}</a>
-        <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-        <ul class="right hide-on-med-and-down">
-        {% if not current_user.is_anonymous %}
-          <li><a href="{{ url_for('logout') }}">Logout <strong>{{ current_user.name }}</strong></a></li>
-        {% elif not request.endpoint == 'login' %}
-          <li><a href={{login_url}}>Log in</a></li>
-        {% endif %}
-        </ul>
-        <ul class="side-nav" id="mobile-demo">
-        {% if not current_user.is_anonymous %}
-          <li><a href="{{ url_for('logout') }}">Logout <strong>{{ current_user.name }}</strong></a></li>
-        {% elif not request.endpoint == 'login' %}
-          <li><a href={{login_url}}>Log in</a></li>
-        {% endif %}
-        </ul>
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">GETIN</a>
       </div>
+      <ul class="nav navbar-nav navbar-right">
+        {% if not current_user.is_anonymous %}
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown">Tools
+          <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">GETIN - Internal</li>
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Admin</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">GETIN - External</li>
+            <li><a href="https://fits.wormbro.academy/" target="_blank"> Fits</a></li>
+            <li><a href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a></li>
+            <li><a href="https://srp.wormbro.academy" target="_blank"> SRP</a></li>
+            <li><a href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a></li>
+            <li><a href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a></li>
+            <li><a href="https://wiki.wormbro.academy/" target="_blank"> Wiki</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Public</li>
+            <li><a href="http://evemaps.dotlan.net/" target="_blank">Dotlan</a></li>
+            <li><a href="https://dscan.me/" target="_blank">Dscan.me</a></li>
+            <li><a href="https://evemarketer.com/" target="_blank">EVEMarketer</a></li>
+            <li><a href="https://docs.google.com/spreadsheets/d/17cNu8hxqJKqkkPnhDlIuJY-IT6ps7kTNCd3BEz0Bvqs/pubhtml#" target="_blank">Rykki's Guide</a></li>
+            <li><a href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a></li>
+          </ul>
+        </li>
+        <li><a href="/"><span class="glyphicon glyphicon-log-in"></span> My Info</a></li>
+        <li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Log out <strong>{{ current_user.name }}</strong></a></li>
+        {% elif not request.endpoint == 'login' %}
+          <li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
-</header>
-
-<main>
+    
   <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          {% if message %}
-            {% if category == 'success' %}
-              <div class="card-panel green lighten-1 flashed disappear">
-            {% else %}
-              <div class="card-panel red lighten-1 flashed">
-            {% endif %}
-              <p>{{ message }}</p>
-            </div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
     {% block content %}{% endblock content %}
   </div>
-</main>
-
+</header>
 </body>
 </html>
