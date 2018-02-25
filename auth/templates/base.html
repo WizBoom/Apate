@@ -19,11 +19,12 @@
       <ul class="nav navbar-nav navbar-right">
         {% if not current_user.is_anonymous %}
         <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown">Tools
-          <span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown">Tools<span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li class="dropdown-header">GETIN - Internal</li>
+            <li><a href="#"></span>Account Management</a></li>
             <li><a href="#"><span class="glyphicon glyphicon-user"></span> Admin</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Corp Management</a></li>
             <li role="separator" class="divider"></li>
             <li class="dropdown-header">GETIN - External</li>
             <li><a href="https://fits.wormbro.academy/" target="_blank"> Fits</a></li>
@@ -41,7 +42,6 @@
             <li><a href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a></li>
           </ul>
         </li>
-        <li><a href="/"><span class="glyphicon glyphicon-log-in"></span> My Info</a></li>
         <li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Log out <strong>{{ current_user.name }}</strong></a></li>
         {% elif not request.endpoint == 'login' %}
           <li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
