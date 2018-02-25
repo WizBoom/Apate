@@ -18,6 +18,29 @@
       </div>
       <ul class="nav navbar-nav navbar-right">
         {% if not current_user.is_anonymous %}
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Tools
+          <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">GETIN - Internal</li>
+            <li><a href="#"> Fits</a></li>
+            <li><a href="#"> Human Resources</a></li>
+            <li><a href="#"> SRP</a></li>
+            <li><a href="#"> Wiki</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Admin</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">GETIN - External</li>
+            <li><a href="#"> Subreddit (/r/GETIN_Eve/)</a></li>
+            <li><a href="#"> Tripwire</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Public</li>
+            <li><a href="#">Dotlan</a></li>
+            <li><a href="#">Dscan.me</a></li>
+            <li><a href="#">EVEMarketer</a></li>
+            <li><a href="#">Rykki's Guide</a></li>
+            <li><a href="#">Subreddit (/r/Wormbro)</a></li>
+          </ul>
+        </li>
         <li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Log out <strong>{{ current_user.name }}</strong></a></li>
         {% elif not request.endpoint == 'login' %}
           <li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
