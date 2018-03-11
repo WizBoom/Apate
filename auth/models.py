@@ -7,7 +7,8 @@ class Character(Database.Model):
     name = Database.Column(Database.String)
     corpId = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
 
-    def __init__(self, name):
+    def __init__(self, id, name):
+        self.id = id
         self.name = name
 
     @property
@@ -23,7 +24,7 @@ class Character(Database.Model):
         return False
 
     def get_id(self):
-        return str(self.character_id)
+        return str(self.id)
 
     def __str__(self):
         return '<Character-{}>'.format(self.name)

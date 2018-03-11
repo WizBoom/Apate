@@ -6,6 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from preston.esi import Preston
 
 from auth.shared import Database
+from auth.human_resources.app import Application as hr_blueprint
 from auth.models import *
 
 
@@ -45,6 +46,9 @@ FlaskApplication.logger.info('Initialization complete')
 
 # Jinja global variables
 FlaskApplication.jinja_env.globals.update(login_url=PrestonConnection.get_authorize_url())
+
+# Blueprints
+FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
 # -- End Initialisation -- #
 
 # -- Methods -- #
@@ -94,13 +98,14 @@ def eve_oauth_callback():
         return redirect(url_for('login'))
     character_info = auth.whoami()
     character_name = character_info['CharacterName']
-    character = Character.query.filter_by(name=name).first()
+    character_id = character_info['CharacterID']
+    character = Character.query.filter_by(id=character_id).first()
     if character:
         login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
         flash('Logged in', 'success')
         return redirect(url_for('landing'))
-    character = Character(character_name)
+    character = Character(character_id, character_name)
     Database.session.add(character)
     Database.session.commit()
     login_user(character)

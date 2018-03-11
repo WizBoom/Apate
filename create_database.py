@@ -5,7 +5,7 @@ from auth.models import *
 
 Database.drop_all()
 Database.create_all()
-character = Character('Alex Kommorov')
+character = Character(92399833, 'Alex Kommorov')
 Database.session.add(character)
 
 corporation = Corporation(98134538, "Wormbro", "NW0RT", "")
