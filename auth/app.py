@@ -114,19 +114,27 @@ def eve_oauth_callback():
 
     # Get character information
     character_info = auth.whoami()
-    character_name = character_info['CharacterName']
     character_id = character_info['CharacterID']
     character = Character.query.filter_by(id=character_id).first()
 
+    # Get character corporation information
+    corporation_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
+    corporation_id = corporation_info['corporation_id']
+
     # If character already exists, log them in
     if character:
+        # Update the corporation if it changed
+        if corporation_id != character.corpId:
+            Util.update_character_corporation(character, corporation_id)
+
         login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
         flash('Logged in', 'success')
         return redirect(url_for('landing'))
 
     # If there is no character, make a new one in the database
-    character = Character(character_id, character_name)
+    character = Character(character_id, character_info['CharacterName'])
+    Util.update_character_corporation(character, corporation_id)
     Database.session.add(character)
     Database.session.commit()
     login_user(character)
