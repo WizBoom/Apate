@@ -8,6 +8,7 @@ from preston.esi import Preston
 from auth.shared import Database
 from auth.human_resources.app import Application as hr_blueprint
 from auth.models import *
+from auth.util import Util
 
 
 # -- Initialisation -- #
@@ -17,7 +18,7 @@ FlaskApplication = Flask(__name__)
 FlaskApplication.permanent_session_lifetime = timedelta(days=14)
 FlaskApplication.config.from_pyfile('config.cfg')
 
-UserAgent = 'GETIN Auth (Apate) app ({})'.format(FlaskApplication.config['USER_AGENT_EMAIL'])
+UserAgent = 'Apate Auth App ({})'.format(FlaskApplication.config['USER_AGENT_EMAIL'])
 
 # EVE  API connection
 PrestonConnection = Preston(
@@ -38,17 +39,31 @@ LoginManager.login_view = 'login'
 
 # Application logging
 FlaskApplication.logger.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
-handler = logging.FileHandler('log.txt')
-handler.setFormatter(logging.Formatter(style='{', fmt='{asctime} [{levelname}] {message}', datefmt='%Y-%m-%d %H:%M:%S'))
-handler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
-FlaskApplication.logger.addHandler(handler)
-FlaskApplication.logger.info('Initialization complete')
+logFormat = logging.Formatter(style='{', fmt='{asctime} [{levelname}] {message}', datefmt='%Y-%m-%d %H:%M:%S')
+
+fileHandler = logging.FileHandler('log.txt')
+fileHandler.setFormatter(logFormat)
+fileHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
+FlaskApplication.logger.addHandler(fileHandler)
+
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormat)
+consoleHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
+FlaskApplication.logger.addHandler(consoleHandler)
 
 # Jinja global variables
 FlaskApplication.jinja_env.globals.update(login_url=PrestonConnection.get_authorize_url())
 
 # Blueprints
 FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
+
+# Util
+Util = Util(
+    FlaskApplication,
+    UserAgent
+)
+
+FlaskApplication.logger.info('Initialization complete')
 # -- End Initialisation -- #
 
 # -- Methods -- #
@@ -96,15 +111,21 @@ def eve_oauth_callback():
         FlaskApplication.logger.error('ESI signing error: ' + str(e))
         flash('There was an authentication error signing you in.', 'error')
         return redirect(url_for('login'))
+
+    # Get character information
     character_info = auth.whoami()
     character_name = character_info['CharacterName']
     character_id = character_info['CharacterID']
     character = Character.query.filter_by(id=character_id).first()
+
+    # If character already exists, log them in
     if character:
         login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
         flash('Logged in', 'success')
         return redirect(url_for('landing'))
+
+    # If there is no character, make a new one in the database
     character = Character(character_id, character_name)
     Database.session.add(character)
     Database.session.commit()
