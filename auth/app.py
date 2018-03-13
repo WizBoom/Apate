@@ -125,7 +125,7 @@ def eve_oauth_callback():
     # If character already exists, log them in
     if character:
         # Update the corporation if it changed
-        if corporation_id != character.corpId:
+        if corporation_id != character.corp_id:
             Util.update_character_corporation(character, corporation_id)
 
         login_user(character)
