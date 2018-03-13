@@ -9,42 +9,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+  <link href="static/open-iconic/font/css/open-iconic.css" rel="stylesheet">
 </head>
 <body>
 <header>
-<!--   <nav class="navbar navbar-inverse">
-    <div class="container">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="/">GETIN</a>
-      </div>
-      <ul class="nav navbar-nav navbar-right">
-        {% if not current_user.is_anonymous %}
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown">Tools<span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li class="dropdown-header">GETIN - External</li>
-            <li><a href="https://fits.wormbro.academy/" target="_blank"> Fits</a></li>
-            <li><a href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a></li>
-            <li><a href="https://srp.wormbro.academy" target="_blank"> SRP</a></li>
-            <li><a href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a></li>
-            <li><a href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a></li>
-            <li><a href="https://wiki.wormbro.academy/" target="_blank"> Wiki</a></li>
-            <li role="separator" class="divider"></li>
-            <li class="dropdown-header">Public</li>
-            <li><a href="http://evemaps.dotlan.net/" target="_blank">Dotlan</a></li>
-            <li><a href="https://dscan.me/" target="_blank">Dscan.me</a></li>
-            <li><a href="https://evemarketer.com/" target="_blank">EVEMarketer</a></li>
-            <li><a href="https://docs.google.com/spreadsheets/d/17cNu8hxqJKqkkPnhDlIuJY-IT6ps7kTNCd3BEz0Bvqs/pubhtml#" target="_blank">Rykki's Guide</a></li>
-            <li><a href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a></li>
-          </ul>
-        </li>
-        <li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Log out <strong>{{ current_user.name }}</strong></a></li>
-        {% elif not request.endpoint == 'login' %}
-          <li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </nav> -->
   <!-- A grey horizontal navbar that becomes vertical on small screens -->
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
   <div class="container">
@@ -54,33 +22,39 @@
     <!-- Links -->
     <ul class="navbar-nav">
       <!-- Dropdown -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Tools</a>
-        <div class="dropdown-menu">
-          <h6 class="dropdown-header">GETIN - Internal</a>
-          <a class="dropdown-item" href="#">Account Management</a>
-          <a class="dropdown-item" href="{{ url_for('admin.index') }}"><img src="/static/open-iconic/svg/person.svg"> Admin</a>
-          <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">GETIN - External</a>
-          <a class="dropdown-item" href="https://fits.wormbro.academy/" target="_blank"> Fits</a>
-          <a class="dropdown-item" href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a>
-          <a class="dropdown-item" href="https://srp.wormbro.academy" target="_blank"> SRP</a>
-          <a class="dropdown-item" href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a>
-          <a class="dropdown-item" href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a>
-          <a class="dropdown-item" href="https://wiki.wormbro.academy/" target="_blank"> Wiki</a>
-          <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">Public</a>
-          <a class="dropdown-item" href="http://evemaps.dotlan.net/" target="_blank">Dotlan</a>
-          <a class="dropdown-item" href="https://dscan.me/" target="_blank">Dscan.me</a>
-          <a class="dropdown-item" href="https://evemarketer.com/" target="_blank">EVEMarketer</a>
-          <a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/17cNu8hxqJKqkkPnhDlIuJY-IT6ps7kTNCd3BEz0Bvqs/pubhtml#" target="_blank">Rykki's Guide</a>
-          <a class="dropdown-item" href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a>
-        </div>
-      </li>
-
+      {% if not current_user.is_anonymous %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Tools</a>
+          <div class="dropdown-menu">
+            <h6 class="dropdown-header">GETIN - Internal</a>
+            <a class="dropdown-item" href="#">Account Management</a>
+            <a class="dropdown-item" href="{{ url_for('admin.index') }}"><img src="/static/open-iconic/svg/person.svg"> Admin</a>
+            <div class="dropdown-divider"></div>
+            <h6 class="dropdown-header">GETIN - External</a>
+            <a class="dropdown-item" href="https://fits.wormbro.academy/" target="_blank"> Fits</a>
+            <a class="dropdown-item" href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a>
+            <a class="dropdown-item" href="https://srp.wormbro.academy" target="_blank"> SRP</a>
+            <a class="dropdown-item" href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a>
+            <a class="dropdown-item" href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a>
+            <a class="dropdown-item" href="https://wiki.wormbro.academy/" target="_blank"> Wiki</a>
+            <div class="dropdown-divider"></div>
+            <h6 class="dropdown-header">Public</a>
+            <a class="dropdown-item" href="http://evemaps.dotlan.net/" target="_blank">Dotlan</a>
+            <a class="dropdown-item" href="https://dscan.me/" target="_blank">Dscan.me</a>
+            <a class="dropdown-item" href="https://evemarketer.com/" target="_blank">EVEMarketer</a>
+            <a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/17cNu8hxqJKqkkPnhDlIuJY-IT6ps7kTNCd3BEz0Bvqs/pubhtml#" target="_blank">Rykki's Guide</a>
+            <a class="dropdown-item" href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('logout') }}">Log out <strong>{{ current_user.name }}</strong>  <span class="oi" data-glyph="account-logout"></span></a>
+        </li>
+       {% elif not request.endpoint == 'login' %}
       <li class="nav-item">
-        <a class="nav-link" href="#">Link 2</a>
+        <a class="nav-link" href="{{ login_url }}"><span class="oi" data-glyph="account-login"></span>  Log in</a>
       </li>
+        {% endif %}
+
     </ul>
   </div>
 </nav>
