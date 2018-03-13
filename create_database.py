@@ -1,19 +1,9 @@
 #!/usr/bin/env python
-from auth.app import Database
-from auth.models import *
-
+from auth.app import Database, Util, FlaskApplication
 
 Database.drop_all()
 Database.create_all()
-character = Character('Alex Kommorov')
-Database.session.add(character)
 
-corporation = Corporation(98134538, "Wormbro", "NW0RT", "")
-Database.session.add(corporation)
-corporation.characters.append(character)
-
-alliance = Alliance(99006650, "The Society For Unethical Treatment Of Sleepers", "GETIN", "")
-Database.session.add(alliance)
-alliance.corporations.append(corporation)
+Util.create_character(FlaskApplication.config['ADMIN_CHARACTER_ID'])
 
 Database.session.commit()

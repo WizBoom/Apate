@@ -1,4 +1,4 @@
-from .shared import Database
+from .shared import Database, SharedInfo
 
 
 class Character(Database.Model):
@@ -7,7 +7,8 @@ class Character(Database.Model):
     name = Database.Column(Database.String)
     corpId = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
 
-    def __init__(self, name):
+    def __init__(self, id, name):
+        self.id = id
         self.name = name
 
     @property
@@ -23,7 +24,14 @@ class Character(Database.Model):
         return False
 
     def get_id(self):
-        return str(self.character_id)
+        return str(self.id)
+
+    def get_corp(self):
+        return Corporation.query.filter_by(id=self.corpId).first()
+
+    @property
+    def is_in_alliance(self):
+        return self.get_corp().allianceId == SharedInfo['alliance_id']
 
     def __str__(self):
         return '<Character-{}>'.format(self.name)
@@ -55,6 +63,9 @@ class Corporation(Database.Model):
     logo = Database.Column(Database.String, nullable=False)
     allianceId = Database.Column(Database.Integer, Database.ForeignKey('Alliances.id'))
     characters = Database.relationship('Character', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
+
+    def get_alliance(self):
+        return Alliance.query.filter_by(id=self.allianceId).first()
 
     def __init__(self, id, name, ticker, logo):
         self.id = id
