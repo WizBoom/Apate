@@ -10,7 +10,7 @@ admin = Util.create_character(FlaskApplication.config['ADMIN_CHARACTER_ID'])
 
 # Make roles / permissions
 adminRole = Role('Superadmin')
-adminPermission = Permission('Superadmin')
+adminPermission = Permission('Admin')
 adminRole.permissions.append(adminPermission)
 admin.permissions.append(adminPermission)
 

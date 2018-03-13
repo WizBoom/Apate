@@ -4,28 +4,24 @@
   <title>GETIN Webportal</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
 <header>
-  <nav class="navbar navbar-inverse">
+<!--   <nav class="navbar navbar-inverse">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand" href="#">GETIN</a>
+        <a class="navbar-brand" href="/">GETIN</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
         {% if not current_user.is_anonymous %}
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown">Tools<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li class="dropdown-header">GETIN - Internal</li>
-            <li><a href="#"></span>Account Management</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Admin</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Corp Management </a></li>
-            <li role="separator" class="divider"></li>
             <li class="dropdown-header">GETIN - External</li>
             <li><a href="https://fits.wormbro.academy/" target="_blank"> Fits</a></li>
             <li><a href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a></li>
@@ -48,11 +44,49 @@
         {% endif %}
       </ul>
     </div>
-  </nav>
-    
+  </nav> -->
+  <!-- A grey horizontal navbar that becomes vertical on small screens -->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand" href="/">GETIN</a>
+
+    <!-- Links -->
+    <ul class="navbar-nav">
+      <!-- Dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Tools</a>
+        <div class="dropdown-menu">
+          <h6 class="dropdown-header">GETIN - Internal</a>
+          <a class="dropdown-item" href="#">Account Management</a>
+          <a class="dropdown-item" href="{{ url_for('admin.index') }}"><img src="/static/open-iconic/svg/person.svg"> Admin</a>
+          <div class="dropdown-divider"></div>
+          <h6 class="dropdown-header">GETIN - External</a>
+          <a class="dropdown-item" href="https://fits.wormbro.academy/" target="_blank"> Fits</a>
+          <a class="dropdown-item" href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a>
+          <a class="dropdown-item" href="https://srp.wormbro.academy" target="_blank"> SRP</a>
+          <a class="dropdown-item" href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a>
+          <a class="dropdown-item" href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a>
+          <a class="dropdown-item" href="https://wiki.wormbro.academy/" target="_blank"> Wiki</a>
+          <div class="dropdown-divider"></div>
+          <h6 class="dropdown-header">Public</a>
+          <a class="dropdown-item" href="http://evemaps.dotlan.net/" target="_blank">Dotlan</a>
+          <a class="dropdown-item" href="https://dscan.me/" target="_blank">Dscan.me</a>
+          <a class="dropdown-item" href="https://evemarketer.com/" target="_blank">EVEMarketer</a>
+          <a class="dropdown-item" href="https://docs.google.com/spreadsheets/d/17cNu8hxqJKqkkPnhDlIuJY-IT6ps7kTNCd3BEz0Bvqs/pubhtml#" target="_blank">Rykki's Guide</a>
+          <a class="dropdown-item" href="https://www.reddit.com/r/Wormbro/" target="_blank">Subreddit (/r/Wormbro)</a>
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link 2</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+</header>
   <div class="container">
     {% block content %}{% endblock content %}
   </div>
-</header>
 </body>
 </html>
