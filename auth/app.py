@@ -5,7 +5,7 @@ from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
 from preston.esi import Preston
 
-from auth.shared import Database
+from auth.shared import Database, SharedInfo
 from auth.human_resources.app import Application as hr_blueprint
 from auth.models import *
 from auth.util import Util
@@ -17,6 +17,7 @@ from auth.util import Util
 FlaskApplication = Flask(__name__)
 FlaskApplication.permanent_session_lifetime = timedelta(days=14)
 FlaskApplication.config.from_pyfile('config.cfg')
+SharedInfo['alliance_id'] = FlaskApplication.config['ALLIANCE_ID']
 
 UserAgent = 'Apate Auth App ({})'.format(FlaskApplication.config['USER_AGENT_EMAIL'])
 
