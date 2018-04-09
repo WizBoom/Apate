@@ -3,12 +3,12 @@ from .shared import Database, SharedInfo
 # -- Connections -- #
 permissionConnection = Database.Table(
     'PermissionConnection',
-    Database.Column('character_id', Database.Integer, Database.ForeignKey('Characters.id')),
-    Database.Column('role_id', Database.Integer, Database.ForeignKey('Permissions.id')))
+    Database.Column('role_id', Database.Integer, Database.ForeignKey('Roles.id')),
+    Database.Column('permission_id', Database.Integer, Database.ForeignKey('Permissions.id')))
 
 roleConnection = Database.Table(
     'RolesConnection',
-    Database.Column('permission_id', Database.Integer, Database.ForeignKey('Permissions.id')),
+    Database.Column('character_id', Database.Integer, Database.ForeignKey('Characters.id')),
     Database.Column('role_id', Database.Integer, Database.ForeignKey('Roles.id')))
 # -- End Connections -- #
 
@@ -95,24 +95,29 @@ class Permission(Database.Model):
     __tablename__ = 'Permissions'
     id = Database.Column(Database.Integer, primary_key=True)
     name = Database.Column(Database.String, nullable=False)
-    characters = Database.relationship('Character', secondary=permissionConnection, backref=Database.backref('permissions', lazy='dynamic'))
+    roles = Database.relationship('Role', secondary=permissionConnection, backref=Database.backref('permissions', lazy='dynamic'))
 
     def __init__(self, name):
         self.name = name
 
     def __repr__(self):
-        return '<Permission-{}>'.format(self.permission_name)
+        return '<Permission-{}>'.format(self.name)
 
 
 class Role(Database.Model):
     __tablename__ = 'Roles'
     id = Database.Column(Database.Integer, primary_key=True)
-    name = Database.Column(Database.String, nullable=False)
-    permissions = Database.relationship('Permission', secondary=roleConnection, backref=Database.backref('roles', lazy='dynamic'))
+    name = Database.Column(Database.String, nullable=False, unique=True)
+    characters = Database.relationship('Character', secondary=roleConnection, backref=Database.backref('roles', lazy='dynamic'))
 
     def __init__(self, name):
         self.name = name
 
     def __str__(self):
         return '<Role-{}>'.format(self.name)
+
+    def has_permission(self, permission_name):
+        # Get permission list
+        permissionNames = [permission.name.lower() for permission in self.permissions]
+        return permission_name.lower() in permissionNames
 # -- End Classes -- #
