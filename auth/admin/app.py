@@ -10,6 +10,9 @@ Application = Blueprint('admin', __name__, template_folder='templates', static_f
 
 @Application.route('/', methods=['GET', 'POST'])
 def index():
+    if not current_user.has_permission("admin"):
+        return redirect(current_app.config['BASE_URL'])
+
     permissions = Permission.query.all()
 
     addRoleForm = AddRoleForm()
