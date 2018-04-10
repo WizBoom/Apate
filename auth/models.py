@@ -41,7 +41,7 @@ class Character(Database.Model):
         return str(self.id)
 
     def get_corp(self):
-        return Corporation.query.filter_by(id=self.corpId).first()
+        return Corporation.query.filter_by(id=self.corp_id).first()
 
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
@@ -88,7 +88,7 @@ class Corporation(Database.Model):
     characters = Database.relationship('Character', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
 
     def get_alliance(self):
-        return Alliance.query.filter_by(id=self.allianceId).first()
+        return Alliance.query.filter_by(id=self.alliance_id).first()
 
     def __init__(self, id, name, ticker, logo):
         self.id = id
