@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Admin</h2>
+<h3>Roles</h3>
+<div class="table-responsive">
+<table class="table" style="width: 1%;">
+  <thead>
+    <tr>
+      	<th></th>
+		{% for permission in permissions %}
+			<th>{{ permission.name }}</th>
+		{% endfor %}
+		<th>
+    </tr>
+  </thead>
+  <tbody>
+  	{% for roleform in roleForms %}
+  	<form method="POST">
+  		<tr>
+  			<input type="hidden" name="roleName" value="{{ roleform.name }}">
+  			<td><strong>{{ roleform.name }}</strong></td>
+  			{% for permission in roleform.permissions %}
+  				{{ permission.hidden }}
+  				<td>{{ permission.hasPermission(disabled = permissions[loop.index - 1].name == "admin") }}</td>
+  			{% endfor %}
+  			<td><button class="btn btn-success btn-sm" type="submit" name="btn" value="EditRole">Save</button></td>
+  			<td><button class="btn btn-danger btn-sm" type="submit" name="btn" value="RemoveRole">Remove</button></td>
+  		</tr>
+  	</form>
+  	{% endfor %}
+  </tbody>
+</table>
+</div>
+<form method="POST">
+  <div class="form-row">
+  	<div class="col-xs-2">
+	{{ addRoleForm.csrf_token }}
+	{{ addRoleForm.roleName(type="text", class="form-control", placeholder="Role Name") }}
+	{% if addRoleForm.roleName.errors %}
+		    {% for error in addRoleForm.roleName.errors %}
+		      {{ error }}
+		    {% endfor %}
+	{% endif %}
+	</div>
+	 <button class="btn btn-dark" name="btn" value="AddRole" type="submit">Add role</button>
+	</div>
+</form>
+<h3>Corporations</h3>
+{% endblock content %}

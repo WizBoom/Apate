@@ -7,6 +7,7 @@ from preston.esi import Preston
 
 from auth.shared import Database, SharedInfo
 from auth.human_resources.app import Application as hr_blueprint
+from auth.admin.app import Application as admin_blueprint
 from auth.models import *
 from auth.util import Util
 
@@ -57,6 +58,7 @@ FlaskApplication.jinja_env.globals.update(login_url=PrestonConnection.get_author
 
 # Blueprints
 FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
+FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 
 # Util
 Util = Util(
@@ -125,7 +127,7 @@ def eve_oauth_callback():
     # If character already exists, log them in
     if character:
         # Update the corporation if it changed
-        if corporation_id != character.corpId:
+        if corporation_id != character.corp_id:
             Util.update_character_corporation(character, corporation_id)
 
         login_user(character)
