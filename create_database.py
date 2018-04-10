@@ -14,18 +14,8 @@ admin.roles.append(adminRole)
 
 # Make permissions
 adminPermission = Permission('admin')
-readMemberPermission = Permission('read_members')
-writeMemberPermission = Permission('write_members')
-createSRPPermission = Permission('create_srp')
-manageRolesPermission = Permission('manage_roles')
-editDiscordPermission = Permission('edit_discord')
 
 # Link permissions
 adminRole.permissions.append(adminPermission)
-adminRole.permissions.append(readMemberPermission)
-adminRole.permissions.append(writeMemberPermission)
-adminRole.permissions.append(createSRPPermission)
-adminRole.permissions.append(manageRolesPermission)
-adminRole.permissions.append(editDiscordPermission)
 
 Database.session.commit()
