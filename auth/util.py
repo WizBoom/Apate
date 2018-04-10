@@ -1,12 +1,12 @@
 import requests
 from auth.models import *
-from auth.shared import Database
+from auth.shared import Database, SharedInfo
+from flask import flash
 
 
 class Util:
-    def __init__(self, application, user_agent):
+    def __init__(self, application):
         self.Application = application
-        self.UserAgent = user_agent
 
     def make_esi_request(self, request_link):
         """Makes an ESI request and logs / returns the necessary info.
@@ -18,7 +18,7 @@ class Util:
             json: Returns the requested ESI object.
         """
         self.Application.logger.debug("make_esi_request > Making ESI request: " + request_link)
-        return requests.get(request_link, headers={'User-Agent': self.UserAgent}).json()
+        return requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']}).json()
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
@@ -135,3 +135,30 @@ class Util:
         Database.session.add(alliance)
         Database.session.commit()
         return alliance
+
+    def remove_role(self, role_name, executing_user_name="System", html_flash=False):
+        """Removes a role based on the role name.
+
+        Args:
+            role_name (string): Name of the role to delete.
+            html_flash (boolean): If enabled, flash a message on screen to notify the user.
+            executing_user_name (string): Name of the user deleting.
+
+        Returns:
+            None
+        """
+
+        # Find the role that needs to be removed
+        role = Role.query.filter_by(name=role_name).first()
+
+        # Double check if there is actually a role with that name
+        # This should always be the case though
+        if role:
+            if not role.has_permission("admin"):
+                Database.session.delete(role)
+                Database.session.commit()
+                if html_flash:
+                    flash('Succesfully removed role {}.'.format(role.name), 'success')
+                self.Application.logger.info('{} removed role {}.'.format(executing_user_name, role.name))
+            elif html_flash:
+                flash('You cannot remove an admin role!', 'danger')

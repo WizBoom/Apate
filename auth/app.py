@@ -19,12 +19,11 @@ FlaskApplication = Flask(__name__)
 FlaskApplication.permanent_session_lifetime = timedelta(days=14)
 FlaskApplication.config.from_pyfile('config.cfg')
 SharedInfo['alliance_id'] = FlaskApplication.config['ALLIANCE_ID']
-
-UserAgent = 'Apate Auth App ({})'.format(FlaskApplication.config['USER_AGENT_EMAIL'])
+SharedInfo['user_agent'] = 'Apate Auth App ({})'.format(FlaskApplication.config['USER_AGENT_EMAIL'])
 
 # EVE  API connection
 PrestonConnection = Preston(
-    user_agent=UserAgent,
+    user_agent=SharedInfo['user_agent'],
     client_id=FlaskApplication.config['EVE_DEFAULT_USER_CLIENT'],
     client_secret=FlaskApplication.config['EVE_DEFAULT_USER_SECRET'],
     callback_url=FlaskApplication.config['BASE_URL'] + FlaskApplication.config['EVE_DEFAULT_USER_CALLBACK']
@@ -62,8 +61,7 @@ FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 
 # Util
 Util = Util(
-    FlaskApplication,
-    UserAgent
+    FlaskApplication
 )
 
 FlaskApplication.logger.info('Initialization complete')
