@@ -20,6 +20,7 @@ class Character(Database.Model):
     id = Database.Column(Database.Integer, primary_key=True)
     name = Database.Column(Database.String)
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
+    admin_corp_id = Database.Column(Database.Integer)
 
     def __init__(self, id, name):
         self.id = id
@@ -41,7 +42,14 @@ class Character(Database.Model):
         return str(self.id)
 
     def get_corp(self):
-        return Corporation.query.filter_by(id=self.corpId).first()
+        if self.has_permission("admin"):
+            corp = Corporation.query.filter_by(id=self.admin_corp_id).first()
+            if corp:
+                return corp
+            else:
+                return Corporation.query.filter_by(id=self.corp_id).first()
+        else:
+            return Corporation.query.filter_by(id=self.corp_id).first()
 
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
@@ -84,17 +92,21 @@ class Corporation(Database.Model):
     name = Database.Column(Database.String, nullable=False)
     ticker = Database.Column(Database.String, nullable=False)
     logo = Database.Column(Database.String, nullable=False)
+    recruitment_open = Database.Column(Database.Boolean)
+    inhouse_description = Database.Column(Database.String)
     alliance_id = Database.Column(Database.Integer, Database.ForeignKey('Alliances.id'))
     characters = Database.relationship('Character', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
 
     def get_alliance(self):
-        return Alliance.query.filter_by(id=self.allianceId).first()
+        return Alliance.query.filter_by(id=self.alliance_id).first()
 
     def __init__(self, id, name, ticker, logo):
         self.id = id
         self.name = name
         self.ticker = ticker
         self.logo = logo
+        self.recruitment_open = False
+        self.inhouse_description = ""
 
     def __repr__(self):
         return '<Corporation-{} [{}]>'.format(self.name, self.ticker)

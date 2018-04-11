@@ -53,6 +53,13 @@ class Util:
         Returns:
             Character: Created character object.
         """
+
+        # Check if corporation already exists
+        character = Character.query.filter_by(id=character_id).first()
+        if character:
+            self.Application.logger.debug("create_character > Character with id {} already exists.".format(str(character_id)))
+            return character
+
         character_json = self.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
 
         # Log and return if the character does not exist
@@ -79,6 +86,13 @@ class Util:
         Returns:
             Corporation: Created corporation object.
         """
+
+        # Check if corporation already exists
+        corporation = Corporation.query.filter_by(id=corp_id).first()
+        if corporation:
+            self.Application.logger.debug("create_corporation > Corporation with id {} already exists.".format(str(corp_id)))
+            return corporation
+
         corporation_json = self.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(corp_id)))
 
         # Log and return if the corporation does not exist
@@ -121,6 +135,13 @@ class Util:
         Returns:
             Alliance: Created alliance object.
         """
+
+        # Check if alliance already exists
+        alliance = Alliance.query.filter_by(id=alliance_id).first()
+        if alliance:
+            self.Application.logger.debug("create_alliance > Alliance with id {} already exists.".format(str(alliance_id)))
+            return alliance
+
         alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/".format(str(alliance_id)))
 
         # Log and return if the alliance does not exist
@@ -135,6 +156,26 @@ class Util:
         Database.session.add(alliance)
         Database.session.commit()
         return alliance
+
+    def create_all_corporations_in_alliance(self, alliance_id):
+        """Creates all the corporations in an alliance based on an alliance id and adds it to the database.
+
+        Args:
+            alliance_id (int): Alliance ID of the alliance to fill.
+
+        Returns:
+            None
+        """
+
+        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/".format(str(alliance_id)))
+
+        # Log and return if the alliance does not exist
+        if not alliance_json:
+            self.Application.logger.warning("create_all_corporations_in_alliance > Alliance with ID {} not found. Returning...".format(str(alliance_id)))
+            return None
+
+        for corporation_id in alliance_json:
+            self.create_corporation(corporation_id)
 
     def remove_role(self, role_name, executing_user_name="System", html_flash=False):
         """Removes a role based on the role name.
