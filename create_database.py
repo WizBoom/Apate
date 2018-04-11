@@ -15,7 +15,6 @@ admin.roles.append(adminRole)
 
 # Make permissions
 adminPermission = Permission('admin')
-testPermission = Permission('test')
 
 # Link permissions
 adminRole.permissions.append(adminPermission)

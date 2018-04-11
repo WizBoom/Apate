@@ -32,9 +32,15 @@ def index():
             edit_role_from_form(permissions, roleForms, request.form['roleName'])
         elif request.form['btn'] == "RemoveRole":
             Util.remove_role(request.form['roleName'], current_user.name, True)
+        elif request.form['btn'] == "MakeCurrentCorp":
+            edit_current_user_admin_corp(request.form['corpId'])
         return redirect(url_for('admin.index'))
 
-    return render_template('index.html', permissions=permissions, addRoleForm=addRoleForm, roleForms=roleForms)
+    # Corporations
+    # Get main alliance
+    alliance = Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first()
+
+    return render_template('index.html', permissions=permissions, addRoleForm=addRoleForm, roleForms=roleForms, corporations=alliance.corporations)
 
 
 def create_edit_role_forms(permissions, create_permissions):
@@ -133,3 +139,30 @@ def edit_role_from_form(permissions, role_forms, role_name):
                 role.name, ", ".join(addedPermissionNames), ", ".join(removedPermissionNames)), 'success')
             current_app.logger.info('{} edited role {} by adding the following permissions: "{}" and by removing the following permissions: "{}".'.format(
                 current_user.name, role.name, ", ".join(addedPermissionNames), ", ".join(removedPermissionNames)))
+
+
+def edit_current_user_admin_corp(corp_id):
+    """Edits current user's admin corporation
+
+    Args:
+        corp_id (int): ID of the new corporation.
+
+    Returns:
+        None
+    """
+
+    # Check if the corporation is actually in the alliance.
+    corporation = Corporation.query.filter_by(id=corp_id).first()
+    setCorp = corp_id
+
+    if not corporation:
+        # Reset to player's corporation
+        current_user.admin_corp_id = current_user.corp_id
+        setCorp = current_user.corp_id
+        flash('Could not find corporation with id {} in database, resetted to your own corporation ({}) instead.'.format(str(corp_id), current_user.corp_id), 'warning')
+    else:
+        current_user.admin_corp_id = corporation.id
+        flash('Set current corporation to {}.'.format(str(corporation.name)), 'success')
+
+    current_app.logger.info("Set {}'s admin corporation ID to {}.".format(current_user.name, str(setCorp)))
+    Database.session.commit()

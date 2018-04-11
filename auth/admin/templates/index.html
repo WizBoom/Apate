@@ -46,5 +46,50 @@
 	 <button class="btn btn-dark" name="btn" value="AddRole" type="submit">Add role</button>
 	</div>
 </form>
+<br>
 <h3>Corporations</h3>
+
+<div class="table-responsive">
+<table class="table">
+  <thead>
+    <tr>
+		{% for corporation in corporations %}
+		<th class="text-center"><strong>{{ corporation.name }}</strong></th>
+		{% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  	<tr>
+  	    {% for corporation in corporations %}
+  		<td class="text-center"><img src="{{ corporation.logo }}" alt="{{ corporation.name }}"></td>
+  		{% endfor %}
+  	</tr>
+  	<tr>
+  	    {% for corporation in corporations %}
+  		<td class="text-center">{{ corporation.inhouse_description }}</td>
+  		{% endfor %}
+  	</tr>
+  	 <tr>
+  	 	{% for corporation in corporations %}
+  		<td class="text-center"><strong>{% if corporation.recruitment_open %}Open{% else %}Closed{% endif %}</strong> recruitment</td>
+  		{% endfor %}
+  	</tr>
+  	 <tr>
+  	 	{% for corporation in corporations %}
+	  	 	{% if corporation.id != current_user.admin_corp_id %}
+	  	 	<td class="text-center">
+	  	 	<form method="POST">
+	  	 	  	<input type="hidden" name="corpId" value="{{ corporation.id }}">
+	  			<button type="submit" value="MakeCurrentCorp" name="btn" class="btn btn-secondary">Make current corp</button>
+	  		</form>
+	  		</td>
+	  		{% else %}
+	  		<td class="text-center"><button type="button" class="btn btn-secondary disabled">Current corp</button></td>
+	  		{% endif %}
+  		{% endfor %}
+  	</tr>
+  </tbody>
+</table>
+</div>
+
 {% endblock content %}
