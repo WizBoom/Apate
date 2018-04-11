@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, current_app, flash, redirect, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from auth.models import *
 from auth.admin.forms import *
 from auth.shared import *
 from auth.util import Util
+from auth.decorators import needs_permission
 
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
@@ -15,10 +16,9 @@ Util = Util(
 
 
 @Application.route('/', methods=['GET', 'POST'])
+@login_required
+@needs_permission('admin', 'Admin Landing')
 def index():
-    if not current_user.has_permission("admin"):
-        return redirect(current_app.config['BASE_URL'])
-
     permissions = Permission.query.all()
 
     # Roles

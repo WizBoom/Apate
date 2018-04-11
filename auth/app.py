@@ -11,8 +11,8 @@ from auth.admin.app import Application as admin_blueprint
 from auth.models import *
 from auth.util import Util
 
-
 # -- Initialisation -- #
+
 
 # Create and configure app
 FlaskApplication = Flask(__name__)
@@ -156,6 +156,11 @@ def logout():
     FlaskApplication.logger.debug('{} logged out'.format(current_user.name if not current_user.is_anonymous else 'unknown user'))
     logout_user()
     return redirect(url_for('landing'))
+
+
+@FlaskApplication.route('/login')
+def login():
+    return redirect(PrestonConnection.get_authorize_url())
 
 
 @FlaskApplication.errorhandler(404)
