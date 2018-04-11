@@ -18,6 +18,5 @@ adminPermission = Permission('admin')
 
 # Link permissions
 adminRole.permissions.append(adminPermission)
-adminRole.permissions.append(testPermission)
 
 Database.session.commit()
