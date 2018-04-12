@@ -94,6 +94,8 @@ class Corporation(Database.Model):
     logo = Database.Column(Database.String, nullable=False)
     recruitment_open = Database.Column(Database.Boolean)
     inhouse_description = Database.Column(Database.String)
+    access_token = Database.Column(Database.String)
+    refresh_token = Database.Column(Database.String)
     alliance_id = Database.Column(Database.Integer, Database.ForeignKey('Alliances.id'))
     characters = Database.relationship('Character', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
 
@@ -107,6 +109,8 @@ class Corporation(Database.Model):
         self.logo = logo
         self.recruitment_open = False
         self.inhouse_description = ""
+        self.access_token = ""
+        self.refresh_token = ""
 
     def __repr__(self):
         return '<Corporation-{} [{}]>'.format(self.name, self.ticker)

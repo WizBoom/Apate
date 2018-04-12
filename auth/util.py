@@ -42,6 +42,7 @@ class Util:
         # if nothing went wrong, add the character to the new corp
         if corporation:
             corporation.characters.append(character)
+            character.admin_corp_id = corporation.id
             Database.session.commit()
 
     def create_character(self, character_id):
