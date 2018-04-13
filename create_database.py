@@ -5,9 +5,11 @@ from auth.models import *
 Database.drop_all()
 Database.create_all()
 
+# Create all corps in the alliance
+Util.create_all_corporations_in_alliance(FlaskApplication.config['ALLIANCE_ID'])
+
 # Make admin
 admin = Util.create_character(FlaskApplication.config['ADMIN_CHARACTER_ID'])
-Util.create_all_corporations_in_alliance(admin.get_corp().get_alliance().id)
 
 # Make admin role
 adminRole = Role('Admin')
