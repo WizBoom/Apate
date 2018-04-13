@@ -127,7 +127,7 @@ def eve_oauth_callback():
     character = Character.query.filter_by(id=character_id).first()
 
     # Get character corporation information
-    corporation_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
+    corporation_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
     corporation_id = corporation_info['corporation_id']
 
     # If character already exists, log them in

@@ -65,7 +65,7 @@ def eve_oauth_corp_callback():
         # Get character's corporation
         auth = EveAPI["corp_preston"].authenticate(request.args['code'])
         character_id = auth.whoami()['CharacterID']
-        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
+        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
         if not('alliance_id' in character_info and character_info['alliance_id'] == SharedInfo['alliance_id']):
             current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in alliance.".format(current_user.name, character_info['name']))
             flash('{} is not a member of the alliance and thus cannot provide a valid ESI code for a corporation!'.format(character_info['name']), 'danger')
