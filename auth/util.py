@@ -40,7 +40,7 @@ class Util:
             corporation = self.create_corporation(corp_id)
 
         # if nothing went wrong, add the character to the new corp
-        if corporation:
+        if corporation and corporation.id != corp_id:
             corporation.characters.append(character)
             character.admin_corp_id = corporation.id
             Database.session.commit()
