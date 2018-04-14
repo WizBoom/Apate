@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, current_app, flash, redirect, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from auth.models import *
 from auth.admin.forms import *
-from auth.shared import *
+from auth.shared import EveAPI, SharedInfo
 from auth.util import Util
-
+from auth.decorators import needs_permission
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
 
@@ -15,10 +15,9 @@ Util = Util(
 
 
 @Application.route('/', methods=['GET', 'POST'])
+@login_required
+@needs_permission('admin', 'Admin Landing')
 def index():
-    if not current_user.has_permission("admin"):
-        return redirect(current_app.config['BASE_URL'])
-
     permissions = Permission.query.all()
 
     # Roles
@@ -40,7 +39,89 @@ def index():
     # Get main alliance
     alliance = Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first()
 
-    return render_template('index.html', permissions=permissions, addRoleForm=addRoleForm, roleForms=roleForms, corporations=alliance.corporations)
+    return render_template('index.html', permissions=permissions, addRoleForm=addRoleForm,
+                           roleForms=roleForms, corporations=alliance.corporations, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
+
+
+@Application.route('/sync/')
+@login_required
+@needs_permission('admin', 'Admin Sync')
+def sync():
+    current_app.logger.info("Starting sync ...")
+
+    statusCode = sync_database_membership()
+    if statusCode != 200:
+        flash("Sync failed on database sync with error code {}".format(str(statusCode)), 'danger')
+        current_app.logger.info("Sync failed.")
+        return redirect(url_for('admin.index'))
+
+    alliance = Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first()
+
+    for corporation in alliance.corporations:
+        if corporation.refresh_token:
+            statusCode = sync_corp_membership(corporation)
+            if statusCode != 200:
+                flash("Sync failed on {} sync with error code {}".format(corporation.name, str(statusCode)), 'danger')
+                current_app.logger.info("Sync failed.")
+                return redirect(url_for('admin.index'))
+
+    current_app.logger.info("Sync completed successfully.")
+    flash('Sync completed successfully.', 'success')
+    return redirect(url_for('admin.index'))
+
+
+@Application.route('/eve/corp/callback')
+@login_required
+@needs_permission('admin', 'Admin Corp Callback')
+def eve_oauth_corp_callback():
+    """Completes the EVE SSO CORP login. Here, a corp's ESI
+    access & refresh token get updated.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+    if 'error' in request.path:
+        current_app.logger.error('Error in EVE SSO callback: ' + request.url)
+        flash('There was an error in EVE\'s SSO response.', 'danger')
+        return redirect(url_for('admin.index'))
+
+    try:
+        # Get character's corporation
+        auth = EveAPI["corp_preston"].authenticate(request.args['code'])
+        character_id = auth.whoami()['CharacterID']
+        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
+        if not('alliance_id' in character_info and character_info['alliance_id'] == SharedInfo['alliance_id']):
+            current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in alliance.".format(current_user.name, character_info['name']))
+            flash('{} is not a member of the alliance and thus cannot provide a valid ESI code for a corporation!'.format(character_info['name']), 'danger')
+            return redirect(url_for('admin.index'))
+
+        # Get corporation
+        corporation = Corporation.query.filter_by(id=character_info['corporation_id']).first()
+
+        # Check if corporation exists
+        if not corporation:
+            current_app.logger.info("eve_oauth_corp_callback > corporation {} is not present in the database!".format(str(character_info['corporation_id'])))
+            flash("The corporation is not present in the database, which shouldn't be possible. Contact the IT wizard!", 'danger')
+            return redirect(url_for('admin.index'))
+
+        corporation.access_token = auth.access_token
+        corporation.refresh_token = auth.refresh_token
+        Database.session.commit()
+        current_app.logger.info("{} (using {}) succesfully updated ESI for {} with access token {} and refresh token {}".format(
+            current_user.name, character_info['name'], corporation.name, str(auth.access_token), str(auth.refresh_token)))
+        flash('Succesfully updated ESI for {}'.format(corporation.name), 'success')
+
+        return redirect(url_for('admin.index'))
+    except Exception as e:
+        current_app.logger.error('ESI signing error: ' + str(e))
+        flash('There was an authentication error signing you in.', 'danger')
+        return redirect(url_for('admin.index'))
+
+    flash(code, 'danger')
+    return redirect(url_for('admin.index'))
 
 
 def create_edit_role_forms(permissions, create_permissions):
@@ -166,3 +247,69 @@ def edit_current_user_admin_corp(corp_id):
 
     current_app.logger.info("Set {}'s admin corporation ID to {}.".format(current_user.name, str(setCorp)))
     Database.session.commit()
+
+
+def sync_database_membership():
+    """Updates all the members in the database.
+
+    Args:
+        None
+
+    Returns:
+        int: status code
+    """
+
+    current_app.logger.info("Syncing database membership ...")
+
+    # Loop over all characters in the database
+    for character in Character.query.all():
+        # Get character information
+        character_payload = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character.id)))
+        character_json = character_payload.json()
+
+        if character_payload.status_code != 200:
+            current_app.logger.error('sync_database_membership > Sync failed with error {}: {}'.format(str(character_payload.status_code, character_json['error'])))
+            current_app.logger.info('Database membership sync failed.')
+            return character_payload.status_code
+
+        Util.update_character_corporation(character, character_json['corporation_id'])
+
+    current_app.logger.info("Successfully synced database membership.")
+    return 200
+
+
+def sync_corp_membership(corporation):
+    """Updates all the members in a corporation.
+
+    Args:
+        corporation (Corporation): Corporation to sync.
+
+    Returns:
+        int: status code
+    """
+
+    current_app.logger.info("Syncing {} membership ...".format(corporation.name))
+
+    # Update access token
+    corporation.access_token = EveAPI["corp_preston"].use_refresh_token(corporation.refresh_token).access_token
+
+    # Get members in corp
+    members_payload = Util.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(str(corporation.id), corporation.access_token))
+    members_json = members_payload.json()
+
+    if members_payload.status_code != 200:
+        current_app.logger.error('sync_corp_membership > Sync failed with error {}: {}'.format(str(members_payload.status_code, members_json['error'])))
+        current_app.logger.info('Corp membership sync failed.')
+        return members_payload.status_code
+
+    # Loop over all corp members
+    for member in members_json:
+        # Check if character already exists in database
+        character = Character.query.filter_by(id=member).first()
+
+        # If not, create it
+        if not character:
+            character = Util.create_character(member)
+
+    current_app.logger.info("Successfully synced {} membership.".format(corporation.name))
+    return 200

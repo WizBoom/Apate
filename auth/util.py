@@ -15,10 +15,10 @@ class Util:
             request_link (str): Request link to send to ESI.
 
         Returns:
-            json: Returns the requested ESI object.
+            response: Returns the ESI response object.
         """
         self.Application.logger.debug("make_esi_request > Making ESI request: " + request_link)
-        return requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']}).json()
+        return requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
@@ -40,8 +40,9 @@ class Util:
             corporation = self.create_corporation(corp_id)
 
         # if nothing went wrong, add the character to the new corp
-        if corporation:
+        if corporation and corporation.id != character.corp_id:
             corporation.characters.append(character)
+            character.admin_corp_id = corporation.id
             Database.session.commit()
 
     def create_character(self, character_id):
@@ -60,7 +61,7 @@ class Util:
             self.Application.logger.debug("create_character > Character with id {} already exists.".format(str(character_id)))
             return character
 
-        character_json = self.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
+        character_json = self.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
 
         # Log and return if the character does not exist
         if not character_json:
@@ -93,7 +94,7 @@ class Util:
             self.Application.logger.debug("create_corporation > Corporation with id {} already exists.".format(str(corp_id)))
             return corporation
 
-        corporation_json = self.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(corp_id)))
+        corporation_json = self.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(corp_id))).json()
 
         # Log and return if the corporation does not exist
         if not corporation_json:
@@ -142,7 +143,7 @@ class Util:
             self.Application.logger.debug("create_alliance > Alliance with id {} already exists.".format(str(alliance_id)))
             return alliance
 
-        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/".format(str(alliance_id)))
+        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/".format(str(alliance_id))).json()
 
         # Log and return if the alliance does not exist
         if not alliance_json:
@@ -167,7 +168,7 @@ class Util:
             None
         """
 
-        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/".format(str(alliance_id)))
+        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/".format(str(alliance_id))).json()
 
         # Log and return if the alliance does not exist
         if not alliance_json:
