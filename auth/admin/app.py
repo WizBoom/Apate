@@ -6,7 +6,7 @@ from auth.shared import EveAPI, SharedInfo
 from auth.util import Util
 from auth.decorators import needs_permission
 # Create and configure app
-Application = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
+Application = Blueprint('admin', __name__, template_folder='templates/admin', static_folder='static')
 
 # Util
 Util = Util(
@@ -39,7 +39,7 @@ def index():
     # Get main alliance
     alliance = Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first()
 
-    return render_template('index.html', permissions=permissions, addRoleForm=addRoleForm,
+    return render_template('admin/index.html', permissions=permissions, addRoleForm=addRoleForm,
                            roleForms=roleForms, corporations=alliance.corporations, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
 
 
