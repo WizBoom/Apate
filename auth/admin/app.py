@@ -209,7 +209,7 @@ def edit_role_from_form(permissions, role_forms, role_name):
                     if permission not in role.permissions:
                         role.permissions.append(permission)
                         addedPermissionNames.append(permission.name)
-                else:
+                elif permission.name != "admin":
                     # Remove if already in permission
                     if permission in role.permissions:
                         role.permissions.remove(permission)
