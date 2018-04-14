@@ -6,7 +6,7 @@ from auth.shared import EveAPI, SharedInfo
 from auth.util import Util
 from auth.decorators import needs_permission
 # Create and configure app
-Application = Blueprint('admin', __name__, template_folder='templates', static_folder='static')
+Application = Blueprint('admin', __name__, template_folder='../templates/admin', static_folder='static')
 
 # Util
 Util = Util(

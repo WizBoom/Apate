@@ -5,8 +5,8 @@ from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
 
 from auth.shared import Database, SharedInfo, EveAPI
-from auth.human_resources.app import Application as hr_blueprint
 from auth.admin.app import Application as admin_blueprint
+from auth.corp_management.app import Application as corp_management_blueprint
 from auth.models import *
 from auth.util import Util
 
@@ -65,8 +65,9 @@ EveAPI["corp_preston"] = Preston(
 FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston"].get_authorize_url())
 
 # Blueprints
-FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
+FlaskApplication.register_blueprint(corp_management_blueprint, url_prefix='/corp_management')
+
 
 # Util
 Util = Util(
