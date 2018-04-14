@@ -4,7 +4,7 @@ from auth.models import *
 from auth.admin.forms import *
 from auth.shared import EveAPI, SharedInfo
 from auth.util import Util
-from auth.decorators import needs_permission
+from auth.decorators import needs_permission, alliance_required
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates/admin', static_folder='static')
 
@@ -16,6 +16,7 @@ Util = Util(
 
 @Application.route('/', methods=['GET', 'POST'])
 @login_required
+@alliance_required()
 @needs_permission('admin', 'Admin Landing')
 def index():
     permissions = Permission.query.all()
@@ -45,6 +46,7 @@ def index():
 
 @Application.route('/sync/')
 @login_required
+@alliance_required()
 @needs_permission('admin', 'Admin Sync')
 def sync():
     current_app.logger.info("Starting sync ...")
@@ -72,6 +74,7 @@ def sync():
 
 @Application.route('/eve/corp/callback')
 @login_required
+@alliance_required()
 @needs_permission('admin', 'Admin Corp Callback')
 def eve_oauth_corp_callback():
     """Completes the EVE SSO CORP login. Here, a corp's ESI
