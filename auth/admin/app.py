@@ -72,61 +72,6 @@ def sync():
     return redirect(url_for('admin.index'))
 
 
-@Application.route('/eve/corp/callback')
-@login_required
-@alliance_required()
-@needs_permission('admin', 'Admin Corp Callback')
-def eve_oauth_corp_callback():
-    """Completes the EVE SSO CORP login. Here, a corp's ESI
-    access & refresh token get updated.
-
-    Args:
-        None
-
-    Returns:
-        str: redirect to the appropriate url.
-    """
-    if 'error' in request.path:
-        current_app.logger.error('Error in EVE SSO callback: ' + request.url)
-        flash('There was an error in EVE\'s SSO response.', 'danger')
-        return redirect(url_for('admin.index'))
-
-    try:
-        # Get character's corporation
-        auth = EveAPI["corp_preston"].authenticate(request.args['code'])
-        character_id = auth.whoami()['CharacterID']
-        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
-        if not('alliance_id' in character_info and character_info['alliance_id'] == SharedInfo['alliance_id']):
-            current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in alliance.".format(current_user.name, character_info['name']))
-            flash('{} is not a member of the alliance and thus cannot provide a valid ESI code for a corporation!'.format(character_info['name']), 'danger')
-            return redirect(url_for('admin.index'))
-
-        # Get corporation
-        corporation = Corporation.query.filter_by(id=character_info['corporation_id']).first()
-
-        # Check if corporation exists
-        if not corporation:
-            current_app.logger.info("eve_oauth_corp_callback > corporation {} is not present in the database!".format(str(character_info['corporation_id'])))
-            flash("The corporation is not present in the database, which shouldn't be possible. Contact the IT wizard!", 'danger')
-            return redirect(url_for('admin.index'))
-
-        corporation.access_token = auth.access_token
-        corporation.refresh_token = auth.refresh_token
-        Database.session.commit()
-        current_app.logger.info("{} (using {}) succesfully updated ESI for {} with access token {} and refresh token {}".format(
-            current_user.name, character_info['name'], corporation.name, str(auth.access_token), str(auth.refresh_token)))
-        flash('Succesfully updated ESI for {}'.format(corporation.name), 'success')
-
-        return redirect(url_for('admin.index'))
-    except Exception as e:
-        current_app.logger.error('ESI signing error: ' + str(e))
-        flash('There was an authentication error signing you in.', 'danger')
-        return redirect(url_for('admin.index'))
-
-    flash(code, 'danger')
-    return redirect(url_for('admin.index'))
-
-
 def create_edit_role_forms(permissions, create_permissions):
     """Creates the edit role forms with the correct permissions.
 

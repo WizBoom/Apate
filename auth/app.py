@@ -57,7 +57,7 @@ EveAPI["corp_preston"] = Preston(
     user_agent=EveAPI['user_agent'],
     client_id=FlaskApplication.config['CORP_CLIENT_ID'],
     client_secret=FlaskApplication.config['CORP_CLIENT_SECRET'],
-    callback_url=FlaskApplication.config['BASE_URL'] + FlaskApplication.config['CORP_CALLBACK_URI'],
+    callback_url=FlaskApplication.config['BASE_URL'] + "/corp_management/eve/corp/callback",
     scope="esi-corporations.read_corporation_membership.v1"
 )
 
