@@ -15,7 +15,7 @@ class Util:
             request_link (str): Request link to send to ESI.
 
         Returns:
-            json: Returns the requested ESI object.
+            response: Returns the ESI response object.
         """
         self.Application.logger.debug("make_esi_request > Making ESI request: " + request_link)
         return requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
@@ -40,7 +40,7 @@ class Util:
             corporation = self.create_corporation(corp_id)
 
         # if nothing went wrong, add the character to the new corp
-        if corporation and corporation.id != corp_id:
+        if corporation and corporation.id != character.corp_id:
             corporation.characters.append(character)
             character.admin_corp_id = corporation.id
             Database.session.commit()

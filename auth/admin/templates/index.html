@@ -1,5 +1,17 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<script>
+  $(document).ready(function() {
+    $('#import').on('click', function() {
+      $(this).addClass('disabled');
+      $(this).text('Syncing ...');
+      window.location.href = "{{ url_for('admin.sync') }}";
+    });
+  });
+</script>
+{% endblock head %}
+
 {% block content %}
 <h2>Admin</h2>
 <h3>Roles</h3>
@@ -97,4 +109,7 @@
   </tbody>
 </table>
 </div>
+<a class="btn btn-outline-danger" id="import" data-toggle="tooltip" title="This will take a while. Use sparingly!" href="#" role="button" aria-pressed="true">Synchronise</a>
+
+<br><br><br>
 {% endblock content %}

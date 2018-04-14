@@ -58,7 +58,7 @@ EveAPI["corp_preston"] = Preston(
     client_id=FlaskApplication.config['CORP_CLIENT_ID'],
     client_secret=FlaskApplication.config['CORP_CLIENT_SECRET'],
     callback_url=FlaskApplication.config['BASE_URL'] + FlaskApplication.config['CORP_CALLBACK_URI'],
-    scope="esi-corporations.read_corporation_membership.v1 esi-wallet.read_corporation_wallets.v1"
+    scope="esi-corporations.read_corporation_membership.v1"
 )
 
 # Jinja global variables
