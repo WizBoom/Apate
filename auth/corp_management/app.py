@@ -1,7 +1,10 @@
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, flash, request, redirect, url_for
 from flask_login import login_required, current_user
 from auth.util import Util
 from auth.decorators import needs_permission, alliance_required
+from auth.shared import EveAPI
+from auth.models import *
+
 # Create and configure app
 Application = Blueprint('corp_management', __name__, template_folder='templates/corp_management', static_folder='static')
 
@@ -18,4 +21,54 @@ Util = Util(
 def index():
     # Get corp
     corporation = current_user.get_corp()
-    return render_template('corp_management/index.html', corporation=corporation)
+    return render_template('corp_management/index.html', corporation=corporation, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
+
+
+@Application.route('/eve/corp/callback')
+@login_required
+@alliance_required()
+@needs_permission('corp_manager', 'Corp Management Corp Callback')
+def eve_oauth_corp_callback():
+    """Completes the EVE SSO CORP login. Here, a corp's ESI
+    access & refresh token get updated.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+    if 'error' in request.path:
+        current_app.logger.error('Error in EVE SSO callback: ' + request.url)
+        flash('There was an error in EVE\'s SSO response.', 'danger')
+        return redirect(url_for('corp_management.index'))
+
+    try:
+        # Current logged in character's corporation
+        currentCorp = current_user.get_corp()
+
+        # Get character's corporation
+        auth = EveAPI["corp_preston"].authenticate(request.args['code'])
+        character_id = auth.whoami()['CharacterID']
+        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
+        if character_info['corporation_id'] != currentCorp.id:
+            current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in same corp ({}).".format(current_user.name, character_info['name'], currentCorp.name))
+            flash("{} is not a member of your current corp ({}) and thus cannot provide a valid ESI code! If you're an admin double check what your current corp is set to.".format(
+                character_info['name'], currentCorp.name), 'danger')
+            return redirect(url_for('corp_management.index'))
+
+        currentCorp.access_token = auth.access_token
+        currentCorp.refresh_token = auth.refresh_token
+        Database.session.commit()
+        current_app.logger.info("{} (using {}) succesfully updated ESI for {} with access token {} and refresh token {}".format(
+            current_user.name, character_info['name'], currentCorp.name, str(auth.access_token), str(auth.refresh_token)))
+        flash('Succesfully updated ESI for {}'.format(currentCorp.name), 'success')
+
+        return redirect(url_for('corp_management.index'))
+    except Exception as e:
+        current_app.logger.error('ESI signing error: ' + str(e))
+        flash('There was an authentication error signing you in.', 'danger')
+        return redirect(url_for('corp_management.index'))
+
+    flash(code, 'danger')
+    return redirect(url_for('corp_management.index'))
