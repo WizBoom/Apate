@@ -5,4 +5,41 @@
 
 {% block content %}
 <h2>Corporation Management</h2>
+<h3>General</h3>
+<br>
+<div class="card bg-light mb-3" style="max-width: 32rem;">
+	<div class="card-header"><h3><img src="{{ corporation.logo }}" alt="{{ corporation.name }}" width=50 height=50> {{ corporation.name }}</h3></div>
+	<div class="card-body">
+		<label for="recruitmentStatusSelect">Recruitment status</label>
+ 		<select id="recruitmentStatusSelect" class="form-control">
+  			<option>Open</option>
+  			<option>Closed</option>
+		</select>
+		<br>
+	  	<div class="form-group">
+	    	<label for="descriptionTextArea">Description</label>
+	    	<textarea class="form-control" id="descriptionTextArea" rows="3"></textarea>
+	  	</div>
+		<button type="submit" name="btn" class="btn btn-success">Save</button>
+  	</div>
+	<div class="card-footer text-center">
+		<strong>{% if not corporation.refresh_token %}No{% endif %}</strong> ESI authentication provided
+		<br><br>
+		<a href="{{ corp_auth_url }}" data-toggle="tooltip" title="Provides ESI Authorization on a corporation level." class="btn btn-outline-dark" role="button" aria-pressed="true">Provide ESI Authorization</a>
+  	</div>
+</div>
+<!-- <div class="table-responsive">
+<table class="table borderless">
+  <thead>
+  </thead>
+  <tbody>
+		<tr><td><h4><strong>{{ corporation.name }}</strong></h4></td></tr>
+  		<tr><td><img src="{{ corporation.logo }}" alt="{{ corporation.name }}" width=75 height=75></td></tr>
+  		<tr><td>{{ corporation.inhouse_description }}</td></tr>
+  		<tr><td><strong>{% if corporation.recruitment_open %}Open{% else %}Closed{% endif %}</strong> recruitment</td></tr>
+  		<tr><td><strong>{% if not corporation.refresh_token %}No{% endif %}</strong> ESI authentication provided</td></tr>
+  </tbody>
+</table>
+</div> -->
+
 {% endblock content %}

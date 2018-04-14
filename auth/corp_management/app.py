@@ -1,5 +1,5 @@
 from flask import Blueprint, current_app, render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 from auth.util import Util
 from auth.decorators import needs_permission, alliance_required
 # Create and configure app
@@ -16,6 +16,6 @@ Util = Util(
 @alliance_required()
 @needs_permission('corp_manager', 'Corp management Landing')
 def index():
-    # Check if character is in alliance
-
-    return render_template('corp_management/index.html')
+    # Get corp
+    corporation = current_user.get_corp()
+    return render_template('corp_management/index.html', corporation=corporation)
