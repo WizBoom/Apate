@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, current_app, flash, redir
 from flask_login import current_user, login_required
 from auth.models import *
 from auth.admin.forms import *
-from auth.shared import EveAPI, SharedInfo
+from auth.shared import EveAPI
 from auth.util import Util
 from auth.decorators import needs_permission, alliance_required
 # Create and configure app
