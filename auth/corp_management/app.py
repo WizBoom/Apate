@@ -13,6 +13,6 @@ Util = Util(
 
 @Application.route('/', methods=['GET', 'POST'])
 @login_required
-@needs_permission('admin', 'Corp management Landing')
+@needs_permission('corp_manager', 'Corp management Landing')
 def index():
     return render_template('corp_management/index.html')
