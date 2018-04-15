@@ -13,6 +13,14 @@ Application = Blueprint('admin', __name__, template_folder='templates/admin', st
 @alliance_required()
 @needs_permission('admin', 'Admin Landing')
 def index():
+    """Landing page of the admin module.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
     permissions = Permission.query.all()
 
     # Roles
@@ -43,6 +51,14 @@ def index():
 @alliance_required()
 @needs_permission('admin', 'Admin Sync')
 def sync():
+    """Page that syncs the whole database.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
     current_app.logger.info("Starting sync ...")
 
     statusCode = sync_database_membership()
@@ -92,7 +108,7 @@ def create_edit_role_forms(permissions, create_permissions):
 
 
 def create_role_from_form(add_role_form):
-    """Creates role based on an AddRoleForm
+    """Creates role based on an AddRoleForm.
 
     Args:
         add_role_form (AddRoleForm): Forms to base role on.
@@ -117,7 +133,7 @@ def create_role_from_form(add_role_form):
 
 
 def edit_role_from_form(permissions, role_forms, role_name):
-    """Edits role based on a list of EditRoleForm
+    """Edits role based on a list of EditRoleForm.
 
     Args:
         permissions (List<Permission>): List of all permissions.
@@ -165,7 +181,7 @@ def edit_role_from_form(permissions, role_forms, role_name):
 
 
 def edit_current_user_admin_corp(corp_id):
-    """Edits current user's admin corporation
+    """Edits current user's admin corporation.
 
     Args:
         corp_id (int): ID of the new corporation.

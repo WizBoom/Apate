@@ -14,7 +14,7 @@ Application = Blueprint('corp_management', __name__, template_folder='templates/
 @alliance_required()
 @needs_permission('corp_manager', 'Corp management Landing')
 def index():
-    """Landing page of the corp management module
+    """Landing page of the corp management module.
 
     Args:
         None
