@@ -143,7 +143,7 @@ def eve_oauth_callback():
         return redirect(url_for('landing'))
 
     # If there is no character, make a new one in the database
-    character = Character(character_id, character_info['CharacterName'])
+    character = Util.create_character(character_id)
     Util.update_character_corporation(character, corporation_id)
     Database.session.add(character)
     Database.session.commit()

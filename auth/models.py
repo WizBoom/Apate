@@ -19,12 +19,14 @@ class Character(Database.Model):
     __tablename__ = 'Characters'
     id = Database.Column(Database.Integer, primary_key=True)
     name = Database.Column(Database.String)
+    main_id = Database.Column(Database.Integer)
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
     admin_corp_id = Database.Column(Database.Integer)
 
-    def __init__(self, id, name):
+    def __init__(self, id, name, main_id):
         self.id = id
         self.name = name
+        self.main_id = main_id
 
     @property
     def is_authenticated(self):

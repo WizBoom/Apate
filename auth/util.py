@@ -45,11 +45,12 @@ class Util:
             character.admin_corp_id = corporation.id
             Database.session.commit()
 
-    def create_character(self, character_id):
+    def create_character(self, character_id, main_id=None):
         """Creates a character based on a character id and adds it to the database.
 
         Args:
             character_id (int): Character ID of the character to create.
+            main_id (int): Optional main character ID.
 
         Returns:
             Character: Created character object.
@@ -69,7 +70,7 @@ class Util:
             return None
 
         # Make character
-        character = Character(character_id, character_json['name'])
+        character = Character(character_id, character_json['name'], main_id if main_id is not None else character_id)
         Database.session.add(character)
 
         # Create corporation
