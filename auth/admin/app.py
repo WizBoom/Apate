@@ -34,8 +34,8 @@ def index():
     # Get main alliance
     alliance = Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first()
 
-    return render_template('admin/index.html', permissions=permissions, addRoleForm=addRoleForm,
-                           roleForms=roleForms, corporations=alliance.corporations, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
+    return render_template('admin/index.html', permissions=permissions, add_role_form=addRoleForm,
+                           role_forms=roleForms, corporations=alliance.corporations, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
 
 
 @Application.route('/sync/')
@@ -85,7 +85,7 @@ def create_edit_role_forms(permissions, create_permissions):
             for permission in permissions:
                 permForm = PermissionForm()
                 permForm.permissionIndex = permission.id
-                permForm.hasPermission = permission in role.permissions
+                permForm.has_permission = permission in role.permissions
                 roleForm.permissions.append_entry(permForm)
         roleForms.append(roleForm)
     return roleForms
@@ -102,14 +102,14 @@ def create_role_from_form(add_role_form):
     """
 
     # Check if role with name already exists
-    role = Role.query.filter_by(name=add_role_form.roleName.data).first()
+    role = Role.query.filter_by(name=add_role_form.role_name.data).first()
 
     # If role already exists, flash a message on screen
     if role:
         flash('Role {} already exists.'.format(role.name), 'warning')
     # Else create the role
     else:
-        role = Role(add_role_form.roleName.data)
+        role = Role(add_role_form.role_name.data)
         Database.session.add(role)
         Database.session.commit()
         flash('Succesfully added role {}.'.format(role.name), 'success')
@@ -146,7 +146,7 @@ def edit_role_from_form(permissions, role_forms, role_name):
             removedPermissionNames = []
             for index, permission in enumerate(permissions):
                 # Check if role has permission now
-                if roleForm.permissions[index].hasPermission.data:
+                if roleForm.permissions[index].has_permission.data:
                     # Add if not already in permission
                     if permission not in role.permissions:
                         role.permissions.append(permission)
