@@ -72,7 +72,7 @@ FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
 
 
 # Util
-Util = Util(
+SharedInfo['util'] = Util(
     FlaskApplication
 )
 
@@ -130,14 +130,14 @@ def eve_oauth_callback():
     character = Character.query.filter_by(id=character_id).first()
 
     # Get character corporation information
-    corporation_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
+    corporation_info = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
     corporation_id = corporation_info['corporation_id']
 
     # If character already exists, log them in
     if character:
         # Update the corporation if it changed
         if corporation_id != character.corp_id:
-            Util.update_character_corporation(character, corporation_id)
+            SharedInfo['util'].update_character_corporation(character, corporation_id)
 
         login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
@@ -145,8 +145,8 @@ def eve_oauth_callback():
         return redirect(url_for('landing'))
 
     # If there is no character, make a new one in the database
-    character = Util.create_character(character_id)
-    Util.update_character_corporation(character, corporation_id)
+    character = SharedInfo['util'].create_character(character_id)
+    SharedInfo['util'].update_character_corporation(character, corporation_id)
     Database.session.add(character)
     Database.session.commit()
     login_user(character)

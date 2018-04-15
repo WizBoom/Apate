@@ -2,16 +2,10 @@ from flask import Blueprint, render_template, request, current_app, flash, redir
 from flask_login import current_user, login_required
 from auth.models import *
 from auth.admin.forms import *
-from auth.shared import EveAPI
-from auth.util import Util
+from auth.shared import EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates/admin', static_folder='static')
-
-# Util
-Util = Util(
-    current_app
-)
 
 
 @Application.route('/', methods=['GET', 'POST'])
@@ -31,7 +25,7 @@ def index():
         elif request.form['btn'] == "EditRole":
             edit_role_from_form(permissions, roleForms, request.form['roleName'])
         elif request.form['btn'] == "RemoveRole":
-            Util.remove_role(request.form['roleName'], current_user.name, True)
+            SharedInfo['util'].remove_role(request.form['roleName'], current_user.name, True)
         elif request.form['btn'] == "MakeCurrentCorp":
             edit_current_user_admin_corp(request.form['corpId'])
         return redirect(url_for('admin.index'))
@@ -212,7 +206,7 @@ def sync_database_membership():
     # Loop over all characters in the database
     for character in Character.query.all():
         # Get character information
-        character_payload = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character.id)))
+        character_payload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character.id)))
         character_json = character_payload.json()
 
         if character_payload.status_code != 200:
@@ -220,7 +214,7 @@ def sync_database_membership():
             current_app.logger.info('Database membership sync failed.')
             return character_payload.status_code
 
-        Util.update_character_corporation(character, character_json['corporation_id'])
+        SharedInfo['util'].update_character_corporation(character, character_json['corporation_id'])
 
     current_app.logger.info("Successfully synced database membership.")
     return 200
@@ -242,7 +236,8 @@ def sync_corp_membership(corporation):
     corporation.access_token = EveAPI["corp_preston"].use_refresh_token(corporation.refresh_token).access_token
 
     # Get members in corp
-    members_payload = Util.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(str(corporation.id), corporation.access_token))
+    members_payload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(
+        str(corporation.id), corporation.access_token))
     members_json = members_payload.json()
 
     if members_payload.status_code != 200:
@@ -257,7 +252,7 @@ def sync_corp_membership(corporation):
 
         # If not, create it
         if not character:
-            character = Util.create_character(member)
+            character = SharedInfo['util'].create_character(member)
 
     current_app.logger.info("Successfully synced {} membership.".format(corporation.name))
     return 200
