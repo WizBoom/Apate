@@ -19,12 +19,14 @@ class Character(Database.Model):
     __tablename__ = 'Characters'
     id = Database.Column(Database.Integer, primary_key=True)
     name = Database.Column(Database.String)
+    main_id = Database.Column(Database.Integer)
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
     admin_corp_id = Database.Column(Database.Integer)
 
-    def __init__(self, id, name):
+    def __init__(self, id, name, main_id):
         self.id = id
         self.name = name
+        self.main_id = main_id
 
     @property
     def is_authenticated(self):
@@ -51,6 +53,12 @@ class Character(Database.Model):
         else:
             return Corporation.query.filter_by(id=self.corp_id).first()
 
+    def get_alts(self):
+        return [alt for alt in Character.query.filter_by(main_id=self.id) if alt.main_id != alt.id]
+
+    def get_main(self):
+        return Character.filter_by(id=self.main_id).first()
+
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
         for role in self.roles:
@@ -63,6 +71,10 @@ class Character(Database.Model):
     @property
     def is_in_alliance(self):
         return self.get_corp().alliance_id == SharedInfo['alliance_id']
+
+    @property
+    def is_main(self):
+        return self.id == self.main_id
 
     def __str__(self):
         return '<Character-{}>'.format(self.name)

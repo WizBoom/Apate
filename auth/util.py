@@ -45,11 +45,12 @@ class Util:
             character.admin_corp_id = corporation.id
             Database.session.commit()
 
-    def create_character(self, character_id):
+    def create_character(self, character_id, main_id=None):
         """Creates a character based on a character id and adds it to the database.
 
         Args:
             character_id (int): Character ID of the character to create.
+            main_id (int): Optional main character ID.
 
         Returns:
             Character: Created character object.
@@ -69,13 +70,14 @@ class Util:
             return None
 
         # Make character
-        character = Character(character_id, character_json['name'])
+        character = Character(character_id, character_json['name'], main_id if main_id is not None else character_id)
         Database.session.add(character)
 
         # Create corporation
         self.update_character_corporation(character, character_json['corporation_id'])
 
         Database.session.commit()
+        self.Application.logger.info("Created account for {}.".format(character.name))
         return character
 
     def create_corporation(self, corp_id):
@@ -125,6 +127,7 @@ class Util:
 
         Database.session.add(corporation)
         Database.session.commit()
+        self.Application.logger.info("Created corporation {}.".format(corporation.name))
         return corporation
 
     def create_alliance(self, alliance_id):
@@ -156,6 +159,7 @@ class Util:
 
         Database.session.add(alliance)
         Database.session.commit()
+        self.Application.logger.info("Created alliance {}.".format(alliance.name))
         return alliance
 
     def create_all_corporations_in_alliance(self, alliance_id):
