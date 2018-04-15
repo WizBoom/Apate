@@ -4,6 +4,7 @@ from auth.util import Util
 from auth.decorators import needs_permission, alliance_required
 from auth.shared import EveAPI
 from auth.models import *
+from auth.corp_management.forms import *
 
 # Create and configure app
 Application = Blueprint('corp_management', __name__, template_folder='templates/corp_management', static_folder='static')
@@ -21,7 +22,34 @@ Util = Util(
 def index():
     # Get corp
     corporation = current_user.get_corp()
-    return render_template('corp_management/index.html', corporation=corporation, corp_auth_url=EveAPI["corp_preston"].get_authorize_url())
+
+    # Check if recruitment is open or closed
+    recruitmentValue = "closed"
+    if corporation.recruitment_open:
+        recruitmentValue = "open"
+    editCorpForm = EditCorpForm(recruitmentStatus=recruitmentValue, description=corporation.inhouse_description)
+
+    if request.method == 'POST':
+        # If EditCorp has been pushed
+        if request.form['btn'] == "EditCorp" and editCorpForm.validate_on_submit():
+            # Check if recruitment status is open or closed
+            if editCorpForm.recruitmentStatus.data == "closed":
+                corporation.recruitment_open = False
+            elif editCorpForm.recruitmentStatus.data == "open":
+                corporation.recruitment_open = True
+
+            # Update description
+            corporation.inhouse_description = editCorpForm.description.data
+            recruitmentStatus = "closed"
+            if corporation.recruitment_open:
+                recruitmentStatus = "open"
+
+            Database.session.commit()
+            current_app.logger.info('{} updated {}\'s description to "{}" and recruitment status to {}.'.format(
+                current_user.name, corporation.name, corporation.inhouse_description, recruitmentStatus))
+            flash('Updated {} description to "{}" and recruitment status to {}.'.format(corporation.name, corporation.inhouse_description, recruitmentStatus), 'success')
+
+    return render_template('corp_management/index.html', corporation=corporation, corp_auth_url=EveAPI["corp_preston"].get_authorize_url(), editCorpForm=editCorpForm)
 
 
 @Application.route('/eve/corp/callback')
