@@ -34,17 +34,17 @@ LoginManager.login_view = 'login'
 
 # Application logging
 FlaskApplication.logger.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
-logFormat = logging.Formatter(style='{', fmt='{asctime} [{levelname}] {message}', datefmt='%Y-%m-%d %H:%M:%S')
+LogFormat = logging.Formatter(style='{', fmt='{asctime} [{levelname}] {message}', datefmt='%Y-%m-%d %H:%M:%S')
 
-fileHandler = logging.FileHandler('log.txt')
-fileHandler.setFormatter(logFormat)
-fileHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
-FlaskApplication.logger.addHandler(fileHandler)
+FileHandler = logging.FileHandler('log.txt')
+FileHandler.setFormatter(LogFormat)
+FileHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
+FlaskApplication.logger.addHandler(FileHandler)
 
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormat)
-consoleHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
-FlaskApplication.logger.addHandler(consoleHandler)
+ConsoleHandler = logging.StreamHandler()
+ConsoleHandler.setFormatter(LogFormat)
+ConsoleHandler.setLevel(FlaskApplication.config['LOGGING_LEVEL'])
+FlaskApplication.logger.addHandler(ConsoleHandler)
 
 # EVE  API connection
 EveAPI["default_user_preston"] = Preston(
@@ -97,6 +97,14 @@ def load_user(character_id):
 
 @FlaskApplication.route('/')
 def landing():
+    """Landing page of the website.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
     return render_template('landing.html')
 
 
@@ -125,19 +133,19 @@ def eve_oauth_callback():
         return redirect(url_for('login'))
 
     # Get character information
-    character_info = auth.whoami()
-    character_id = character_info['CharacterID']
-    character = Character.query.filter_by(id=character_id).first()
+    characterInfo = auth.whoami()
+    characterId = characterInfo['CharacterID']
+    character = Character.query.filter_by(id=characterId).first()
 
     # Get character corporation information
-    corporation_info = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
-    corporation_id = corporation_info['corporation_id']
+    corporationInfo = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(characterId))).json()
+    corporationId = corporationInfo['corporation_id']
 
     # If character already exists, log them in
     if character:
         # Update the corporation if it changed
-        if corporation_id != character.corp_id:
-            SharedInfo['util'].update_character_corporation(character, corporation_id)
+        if corporationId != character.corp_id:
+            SharedInfo['util'].update_character_corporation(character, corporationId)
 
         login_user(character)
         FlaskApplication.logger.debug('{} logged in with EVE SSO'.format(current_user.name))
@@ -145,8 +153,8 @@ def eve_oauth_callback():
         return redirect(url_for('landing'))
 
     # If there is no character, make a new one in the database
-    character = SharedInfo['util'].create_character(character_id)
-    SharedInfo['util'].update_character_corporation(character, corporation_id)
+    character = SharedInfo['util'].create_character(characterId)
+    SharedInfo['util'].update_character_corporation(character, corporationId)
     Database.session.add(character)
     Database.session.commit()
     login_user(character)
@@ -170,6 +178,14 @@ def logout():
 
 @FlaskApplication.route('/login')
 def login():
+    """Directs user to the login page.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to login page.
+    """
     return redirect(EveAPI["default_user_preston"].get_authorize_url())
 
 
