@@ -24,7 +24,7 @@ def index():
     # Get corp
     corporation = current_user.get_corp()
     members = corporation.characters.order_by(func.lower(Character.name))
-    members = [member for member in members if member.main_id == member.id]
+    members = [member for member in members if member.is_main]
     roles = Role.query.all()
 
     # Check if recruitment is open or closed

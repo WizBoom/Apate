@@ -77,6 +77,7 @@ class Util:
         self.update_character_corporation(character, character_json['corporation_id'])
 
         Database.session.commit()
+        self.Application.logger.info("Created account for {}.".format(character.name))
         return character
 
     def create_corporation(self, corp_id):
@@ -126,6 +127,7 @@ class Util:
 
         Database.session.add(corporation)
         Database.session.commit()
+        self.Application.logger.info("Created corporation {}.".format(corporation.name))
         return corporation
 
     def create_alliance(self, alliance_id):
@@ -157,6 +159,7 @@ class Util:
 
         Database.session.add(alliance)
         Database.session.commit()
+        self.Application.logger.info("Created alliance {}.".format(alliance.name))
         return alliance
 
     def create_all_corporations_in_alliance(self, alliance_id):

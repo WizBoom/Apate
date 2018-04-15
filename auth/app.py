@@ -148,7 +148,6 @@ def eve_oauth_callback():
     Database.session.add(character)
     Database.session.commit()
     login_user(character)
-    FlaskApplication.logger.info('{} created an account'.format(current_user.name))
     return redirect(url_for('landing'))
 
 

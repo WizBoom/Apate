@@ -53,6 +53,9 @@ class Character(Database.Model):
         else:
             return Corporation.query.filter_by(id=self.corp_id).first()
 
+    def get_alts(self):
+        return [alt for alt in Character.query.filter_by(main_id=self.id) if alt.main_id != alt.id]
+
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
         for role in self.roles:
@@ -65,6 +68,10 @@ class Character(Database.Model):
     @property
     def is_in_alliance(self):
         return self.get_corp().alliance_id == SharedInfo['alliance_id']
+
+    @property
+    def is_main(self):
+        return self.id == self.main_id
 
     def __str__(self):
         return '<Character-{}>'.format(self.name)
