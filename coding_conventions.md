@@ -1,10 +1,12 @@
 # Variables
 ## Global
 Uppercase, underscores as spaces.
+
 EXAMPLE_VARIABLE
 
 ## Local
 Camel case.
+
 exampleVariable
 
 # Functions
@@ -31,12 +33,15 @@ Example descriptor:
 ```` 
 ## Public
 Lowercase, underscores as spaces.
+
 example_function()
 
 ## Private
 Lowercase, underscores as space, prefaced with underscore.
+
 _example_function()
 
 ## Parameters
 Camel case.
+
 example_function(exampleParameter)
