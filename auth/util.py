@@ -62,19 +62,19 @@ class Util:
             self.Application.logger.debug("create_character > Character with id {} already exists.".format(str(character_id)))
             return character
 
-        character_json = self.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
+        characterJson = self.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
 
         # Log and return if the character does not exist
-        if not character_json:
+        if not characterJson:
             self.Application.logger.warning("create_character > Character with ID {} not found. Returning...".format(str(character_id)))
             return None
 
         # Make character
-        character = Character(character_id, character_json['name'], main_id if main_id is not None else character_id)
+        character = Character(character_id, characterJson['name'], main_id if main_id is not None else character_id)
         Database.session.add(character)
 
         # Create corporation
-        self.update_character_corporation(character, character_json['corporation_id'])
+        self.update_character_corporation(character, characterJson['corporation_id'])
 
         Database.session.commit()
         self.Application.logger.info("Created account for {}.".format(character.name))
@@ -96,27 +96,27 @@ class Util:
             self.Application.logger.debug("create_corporation > Corporation with id {} already exists.".format(str(corp_id)))
             return corporation
 
-        corporation_json = self.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(corp_id))).json()
+        corporationJson = self.make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(corp_id))).json()
 
         # Log and return if the corporation does not exist
-        if not corporation_json:
+        if not corporationJson:
             self.Application.logger.warning("create_corporation > Corporation with ID {} not found. Returning...".format(str(corp_id)))
             return None
 
         # Make corporation
-        corporation = Corporation(corp_id, corporation_json['name'], corporation_json['ticker'],
+        corporation = Corporation(corp_id, corporationJson['name'], corporationJson['ticker'],
                                   "http://image.eveonline.com/Corporation/{}_128.png".format(str(corp_id)))
 
         # Check if corporation has alliance
-        if 'alliance_id' in corporation_json:
-            alliance_id = corporation_json['alliance_id']
+        if 'alliance_id' in corporationJson:
+            allianceId = corporationJson['alliance_id']
 
             # Check if alliance already exists
-            alliance = Alliance.query.filter_by(id=alliance_id).first()
+            alliance = Alliance.query.filter_by(id=allianceId).first()
 
             if not alliance:
                 # Create alliance
-                alliance = self.create_alliance(alliance_id)
+                alliance = self.create_alliance(allianceId)
 
                 if alliance:
                     Database.session.add(alliance)
@@ -146,15 +146,15 @@ class Util:
             self.Application.logger.debug("create_alliance > Alliance with id {} already exists.".format(str(alliance_id)))
             return alliance
 
-        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/".format(str(alliance_id))).json()
+        allianceJson = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/".format(str(alliance_id))).json()
 
         # Log and return if the alliance does not exist
-        if not alliance_json:
+        if not allianceJson:
             self.Application.logger.warning("create_alliance > Alliance with ID {} not found. Returning...".format(str(alliance_id)))
             return None
 
         # Make alliance
-        alliance = Alliance(alliance_id, alliance_json['name'], alliance_json['ticker'],
+        alliance = Alliance(alliance_id, allianceJson['name'], allianceJson['ticker'],
                             "http://image.eveonline.com/Alliance/{}_128.png".format(str(alliance_id)))
 
         Database.session.add(alliance)
@@ -172,14 +172,14 @@ class Util:
             None
         """
 
-        alliance_json = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/".format(str(alliance_id))).json()
+        allianceJson = self.make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/".format(str(alliance_id))).json()
 
         # Log and return if the alliance does not exist
-        if not alliance_json:
+        if not allianceJson:
             self.Application.logger.warning("create_all_corporations_in_alliance > Alliance with ID {} not found. Returning...".format(str(alliance_id)))
             return None
 
-        for corporation_id in alliance_json:
+        for corporation_id in allianceJson:
             self.create_corporation(corporation_id)
 
     def remove_role(self, role_name, executing_user_name="System", html_flash=False):
