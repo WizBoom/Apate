@@ -9,6 +9,11 @@ Camel case.
 
 exampleVariable
 
+# Classes
+Pascal casing.
+
+ExampleClass
+
 # Functions
 All functions must have a descriptor showing arguments, returns and what the function does.
 This is the template for the descriptor:
