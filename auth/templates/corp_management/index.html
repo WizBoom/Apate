@@ -5,4 +5,26 @@
 
 {% block content %}
 <h2>Corporation Management</h2>
+<h3>General</h3>
+<br>
+<div class="card bg-light mb-3" style="max-width: 32rem;">
+	<div class="card-header"><h3><img src="{{ corporation.logo }}" alt="{{ corporation.name }}" width=50 height=50> {{ corporation.name }}</h3></div>
+	<div class="card-body">
+		<form method="POST">
+			{{ editCorpForm.csrf_token }}
+			<label for="{{ editCorpForm.recruitmentStatus.id }}">{{ editCorpForm.recruitmentStatus.label.text }}</label>
+			{{ editCorpForm.recruitmentStatus(class="form-control") }}
+			<br>
+			<label for="{{ editCorpForm.description.id }}">{{ editCorpForm.description.label.text }}</label>
+			{{ editCorpForm.description(class="form-control", rows="3") }}
+			<br>
+			<button type="submit" name="btn" value="EditCorp" class="btn btn-success">Save</button>
+		</form>
+  	</div>
+	<div class="card-footer text-center">
+		<strong>{% if not corporation.refresh_token %}No{% endif %}</strong> ESI authentication provided
+		<br><br>
+		<a href="{{ corp_auth_url }}" data-toggle="tooltip" title="Provides ESI Authorization on a corporation level." class="btn btn-outline-dark" role="button" aria-pressed="true">Provide ESI Authorization</a>
+  	</div>
+</div>
 {% endblock content %}
