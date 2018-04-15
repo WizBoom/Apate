@@ -56,6 +56,9 @@ class Character(Database.Model):
     def get_alts(self):
         return [alt for alt in Character.query.filter_by(main_id=self.id) if alt.main_id != alt.id]
 
+    def get_main(self):
+        return Character.filter_by(id=self.main_id).first()
+
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
         for role in self.roles:
