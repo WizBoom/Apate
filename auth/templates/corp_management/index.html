@@ -5,7 +5,6 @@
 
 {% block content %}
 <h2>Corporation Management</h2>
-<h3>General</h3>
 <div class="card bg-light mb-3" style="max-width: 32rem;">
 	<div class="card-header"><h3><img src="{{ corporation.logo }}" alt="{{ corporation.name }}" width=50 height=50> {{ corporation.name }}</h3></div>
 	<div class="card-body">
@@ -26,9 +25,4 @@
 		<a href="{{ corp_auth_url }}" data-toggle="tooltip" title="Provides ESI Authorization on a corporation level." class="btn btn-outline-dark" role="button" aria-pressed="true">Provide ESI Authorization</a>
   	</div>
 </div>
-<br>
-<h3>Role Management</h3>
-{% for member in members %}
-<p>{{ member.name }}</p>
-{% endfor %}
 {% endblock content %}

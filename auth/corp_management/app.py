@@ -5,7 +5,7 @@ from auth.decorators import needs_permission, alliance_required
 from auth.shared import EveAPI
 from auth.models import *
 from auth.corp_management.forms import *
-from sqlalchemy import func
+
 
 # Create and configure app
 Application = Blueprint('corp_management', __name__, template_folder='templates/corp_management', static_folder='static')
@@ -23,9 +23,6 @@ Util = Util(
 def index():
     # Get corp
     corporation = current_user.get_corp()
-    members = corporation.characters.order_by(func.lower(Character.name))
-    members = [member for member in members if member.is_main]
-    roles = Role.query.all()
 
     # Check if recruitment is open or closed
     recruitmentValue = "closed"
@@ -53,7 +50,7 @@ def index():
                 current_user.name, corporation.name, corporation.inhouse_description, recruitmentStatus))
             flash('Updated {} description to "{}" and recruitment status to {}.'.format(corporation.name, corporation.inhouse_description, recruitmentStatus), 'success')
 
-    return render_template('corp_management/index.html', corporation=corporation, corp_auth_url=EveAPI["corp_preston"].get_authorize_url(), editCorpForm=editCorpForm, members=members, roles=roles)
+    return render_template('corp_management/index.html', corporation=corporation, corp_auth_url=EveAPI["corp_preston"].get_authorize_url(), editCorpForm=editCorpForm)
 
 
 @Application.route('/eve/corp/callback')
