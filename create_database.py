@@ -1,26 +1,27 @@
 #!/usr/bin/env python
-from auth.app import Database, Util, FlaskApplication
+from auth.shared import SharedInfo
+from auth.app import Database, FlaskApplication
 from auth.models import *
 
 Database.drop_all()
 Database.create_all()
 
 # Create all corps in the alliance
-Util.create_all_corporations_in_alliance(FlaskApplication.config['ALLIANCE_ID'])
+SharedInfo['util'].create_all_corporations_in_alliance(FlaskApplication.config['ALLIANCE_ID'])
 
 # Make admin
-admin = Util.create_character(FlaskApplication.config['ADMIN_CHARACTER_ID'])
+Admin = SharedInfo['util'].create_character(FlaskApplication.config['ADMIN_CHARACTER_ID'])
 
 # Make admin role
-adminRole = Role('Admin')
-admin.roles.append(adminRole)
+AdminRole = Role('Admin')
+Admin.roles.append(AdminRole)
 
 # Make permissions
-adminPermission = Permission('admin')
-corpManagerPermission = Permission('corp_manager')
+AdminPermission = Permission('admin')
+CorpManagerPermission = Permission('corp_manager')
 
 # Link permissions
-adminRole.permissions.append(adminPermission)
-adminRole.permissions.append(corpManagerPermission)
+AdminRole.permissions.append(AdminPermission)
+AdminRole.permissions.append(CorpManagerPermission)
 
 Database.session.commit()
