@@ -26,7 +26,7 @@ Example descriptor:
     """This serves as an example descriptor.
 
     Args:
-        exampleArgument (int): Example integer argument.
+        example_argument (int): Example integer argument.
 
     Returns:
         int: Example integer return. 
@@ -42,6 +42,6 @@ Lowercase, underscores as space, prefaced with underscore.
 _example_function()
 
 ## Parameters
-Camel case.
+Lowercase, underscores as spaces.
 
-example_function(exampleParameter)
+example_function(example_parameter)
