@@ -1,8 +1,8 @@
 # Variables
 ## Global
-Uppercase, underscores as spaces.
+Pascal casing.
 
-EXAMPLE_VARIABLE
+ExampleVariable
 
 ## Local
 Camel case.
