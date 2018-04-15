@@ -10,8 +10,8 @@
 	<div class="card-body">
 		<form method="POST">
 			{{ editCorpForm.csrf_token }}
-			<label for="{{ editCorpForm.recruitmentStatus.id }}">{{ editCorpForm.recruitmentStatus.label.text }}</label>
-			{{ editCorpForm.recruitmentStatus(class="form-control") }}
+			<label for="{{ editCorpForm.recruitment_status.id }}">{{ editCorpForm.recruitment_status.label.text }}</label>
+			{{ editCorpForm.recruitment_status(class="form-control") }}
 			<br>
 			<label for="{{ editCorpForm.description.id }}">{{ editCorpForm.description.label.text }}</label>
 			{{ editCorpForm.description(class="form-control", rows="3") }}

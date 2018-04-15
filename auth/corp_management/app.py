@@ -14,6 +14,15 @@ Application = Blueprint('corp_management', __name__, template_folder='templates/
 @alliance_required()
 @needs_permission('corp_manager', 'Corp management Landing')
 def index():
+    """Landing page of the corp management module.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     # Get corp
     corporation = current_user.get_corp()
 
@@ -21,15 +30,15 @@ def index():
     recruitmentValue = "closed"
     if corporation.recruitment_open:
         recruitmentValue = "open"
-    editCorpForm = EditCorpForm(recruitmentStatus=recruitmentValue, description=corporation.inhouse_description)
+    editCorpForm = EditCorpForm(recruitment_status=recruitmentValue, description=corporation.inhouse_description)
 
     if request.method == 'POST':
         # If EditCorp has been pushed
         if request.form['btn'] == "EditCorp" and editCorpForm.validate_on_submit():
             # Check if recruitment status is open or closed
-            if editCorpForm.recruitmentStatus.data == "closed":
+            if editCorpForm.recruitment_status.data == "closed":
                 corporation.recruitment_open = False
-            elif editCorpForm.recruitmentStatus.data == "open":
+            elif editCorpForm.recruitment_status.data == "open":
                 corporation.recruitment_open = True
 
             # Update description
@@ -71,19 +80,19 @@ def eve_oauth_corp_callback():
 
         # Get character's corporation
         auth = EveAPI["corp_preston"].authenticate(request.args['code'])
-        character_id = auth.whoami()['CharacterID']
-        character_info = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
-        if character_info['corporation_id'] != currentCorp.id:
-            current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in same corp ({}).".format(current_user.name, character_info['name'], currentCorp.name))
+        characterId = auth.whoami()['CharacterID']
+        characterInfo = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(characterId))).json()
+        if characterInfo['corporation_id'] != currentCorp.id:
+            current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in same corp ({}).".format(current_user.name, characterInfo['name'], currentCorp.name))
             flash("{} is not a member of your current corp ({}) and thus cannot provide a valid ESI code! If you're an admin double check what your current corp is set to.".format(
-                character_info['name'], currentCorp.name), 'danger')
+                characterInfo['name'], currentCorp.name), 'danger')
             return redirect(url_for('corp_management.index'))
 
         currentCorp.access_token = auth.access_token
         currentCorp.refresh_token = auth.refresh_token
         Database.session.commit()
         current_app.logger.info("{} (using {}) succesfully updated ESI for {} with access token {} and refresh token {}".format(
-            current_user.name, character_info['name'], currentCorp.name, str(auth.access_token), str(auth.refresh_token)))
+            current_user.name, characterInfo['name'], currentCorp.name, str(auth.access_token), str(auth.refresh_token)))
         flash('Succesfully updated ESI for {}'.format(currentCorp.name), 'success')
 
         return redirect(url_for('corp_management.index'))

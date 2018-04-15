@@ -4,13 +4,13 @@ from wtforms.validators import InputRequired
 
 
 class AddRoleForm(FlaskForm):
-    roleName = StringField('role', validators=[InputRequired()])
+    role_name = StringField('role', validators=[InputRequired()])
 
 
 class PermissionForm(FlaskForm):
     # If we don't have this hidden field in de index, shit doesnt work for some reason
     hidden = HiddenField()
-    hasPermission = BooleanField()
+    has_permission = BooleanField()
 
 
 class EditRoleForm(FlaskForm):
