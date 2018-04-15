@@ -1,6 +1,5 @@
 from flask import Blueprint, current_app, render_template, flash, request, redirect, url_for
 from flask_login import login_required, current_user
-from auth.util import Util
 from auth.decorators import needs_permission, alliance_required
 from auth.shared import EveAPI
 from auth.models import *
@@ -8,11 +7,6 @@ from auth.corp_management.forms import *
 
 # Create and configure app
 Application = Blueprint('corp_management', __name__, template_folder='templates/corp_management', static_folder='static')
-
-# Util
-Util = Util(
-    current_app
-)
 
 
 @Application.route('/', methods=['GET', 'POST'])
@@ -78,7 +72,7 @@ def eve_oauth_corp_callback():
         # Get character's corporation
         auth = EveAPI["corp_preston"].authenticate(request.args['code'])
         character_id = auth.whoami()['CharacterID']
-        character_info = Util.make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
+        character_info = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id))).json()
         if character_info['corporation_id'] != currentCorp.id:
             current_app.logger.info("{} tried to add a corporation ESI code with a character ({}) that isn't in same corp ({}).".format(current_user.name, character_info['name'], currentCorp.name))
             flash("{} is not a member of your current corp ({}) and thus cannot provide a valid ESI code! If you're an admin double check what your current corp is set to.".format(
