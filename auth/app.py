@@ -7,6 +7,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from auth.shared import Database, SharedInfo, EveAPI
 from auth.admin.app import Application as admin_blueprint
 from auth.corp_management.app import Application as corp_management_blueprint
+from auth.hr import Application as hr_blueprint
 from auth.models import *
 from auth.util import Util
 
@@ -67,6 +68,7 @@ FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston
 # Blueprints
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 FlaskApplication.register_blueprint(corp_management_blueprint, url_prefix='/corp_management')
+FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
 
 
 # Util
@@ -168,7 +170,7 @@ def logout():
 
 @FlaskApplication.route('/login')
 def login():
-    return redirect(SharedInfo["default_user_preston"].get_authorize_url())
+    return redirect(EveAPI["default_user_preston"].get_authorize_url())
 
 
 @FlaskApplication.errorhandler(404)
