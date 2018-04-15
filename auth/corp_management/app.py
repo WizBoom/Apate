@@ -6,7 +6,6 @@ from auth.shared import EveAPI
 from auth.models import *
 from auth.corp_management.forms import *
 
-
 # Create and configure app
 Application = Blueprint('corp_management', __name__, template_folder='templates/corp_management', static_folder='static')
 
