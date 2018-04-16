@@ -222,15 +222,15 @@ def sync_database_membership():
     # Loop over all characters in the database
     for character in Character.query.all():
         # Get character information
-        character_payload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character.id)))
-        character_json = character_payload.json()
+        characterPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character.id)))
+        characterJson = characterPayload.json()
 
-        if character_payload.status_code != 200:
-            current_app.logger.error('sync_database_membership > Sync failed with error {}: {}'.format(str(character_payload.status_code, character_json['error'])))
+        if characterPayload.status_code != 200:
+            current_app.logger.error('sync_database_membership > Sync failed with error {}: {}'.format(str(characterPayload.status_code, characterJson['error'])))
             current_app.logger.info('Database membership sync failed.')
-            return character_payload.status_code
+            return characterPayload.status_code
 
-        SharedInfo['util'].update_character_corporation(character, character_json['corporation_id'])
+        SharedInfo['util'].update_character_corporation(character, characterJson['corporation_id'])
 
     current_app.logger.info("Successfully synced database membership.")
     return 200
@@ -252,17 +252,17 @@ def sync_corp_membership(corporation):
     corporation.access_token = EveAPI["corp_preston"].use_refresh_token(corporation.refresh_token).access_token
 
     # Get members in corp
-    members_payload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(
+    membersPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(
         str(corporation.id), corporation.access_token))
-    members_json = members_payload.json()
+    membersJson = membersPayload.json()
 
-    if members_payload.status_code != 200:
-        current_app.logger.error('sync_corp_membership > Sync failed with error {}: {}'.format(str(members_payload.status_code, members_json['error'])))
+    if membersPayload.status_code != 200:
+        current_app.logger.error('sync_corp_membership > Sync failed with error {}: {}'.format(str(membersPayload.status_code, membersJson['error'])))
         current_app.logger.info('Corp membership sync failed.')
-        return members_payload.status_code
+        return membersPayload.status_code
 
     # Loop over all corp members
-    for member in members_json:
+    for member in membersJson:
         # Check if character already exists in database
         character = Character.query.filter_by(id=member).first()
 
