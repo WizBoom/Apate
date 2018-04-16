@@ -4,7 +4,6 @@ from auth.models import *
 from auth.admin.forms import *
 from auth.shared import EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
-from preston import Preston
 
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates/admin', static_folder='static')
