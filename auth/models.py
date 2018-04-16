@@ -22,6 +22,7 @@ class Character(Database.Model):
     main_id = Database.Column(Database.Integer)
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
     admin_corp_id = Database.Column(Database.Integer)
+    application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, id, name, main_id):
         self.id = id
@@ -157,4 +158,14 @@ class Role(Database.Model):
         # Get permission list
         permissionNames = [permission.name.lower() for permission in self.permissions]
         return permission_name.lower() in permissionNames
+
+
+class Application(Database.Model):
+    __tablename__ = 'Applications'
+    id = Database.Column(Database.Integer, primary_key=True)
+    character_id = Database.Column(Database.Integer, Database.ForeignKey(Character.id))
+    character = Database.relationship("Character", backref="Applications")
+
+    def __repr__(self):
+        return '<Application-{}>'.format(str(self.character.name))
 # -- End Classes -- #
