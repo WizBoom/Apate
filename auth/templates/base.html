@@ -38,16 +38,18 @@
           <div class="dropdown-menu">
             <h6 class="dropdown-header">GETIN - Internal</a>
             <a class="dropdown-item" href="#">Account Management</a>
+            {% if current_user.has_permission("admin") %}
+            <a class="dropdown-item" href="{{ url_for('admin.index') }}"><img src="/static/open-iconic/svg/person.svg"> Admin</a>
+            {% endif %}
             {% if current_user.has_permission("corp_manager") %}
             <a class="dropdown-item" href="{{ url_for('corp_management.index') }}"><img src="/static/open-iconic/svg/person.svg"> Corp Management</a>
             {% endif %}
-            {% if current_user.has_permission("admin") %}
-            <a class="dropdown-item" href="{{ url_for('admin.index') }}"><img src="/static/open-iconic/svg/person.svg"> Admin</a>
+            {% if current_user.has_permission("read_membership") %}
+            <a class="dropdown-item" href="{{ url_for('hr.index') }}">Human Resources</a>
             {% endif %}
             <div class="dropdown-divider"></div>
             <h6 class="dropdown-header">GETIN - External</a>
             <a class="dropdown-item" href="https://fits.wormbro.academy/" target="_blank"> Fits</a>
-            <a class="dropdown-item" href="https://auth.wormbro.academy/hr/" target="_blank"> Human Resources</a>
             <a class="dropdown-item" href="https://srp.wormbro.academy" target="_blank"> SRP</a>
             <a class="dropdown-item" href="https://www.reddit.com/r/GETIN_Eve/" target="_blank"> Subreddit (/r/GETIN_Eve/)</a>
             <a class="dropdown-item" href="https://tripwire.wormbro.academy/?system=" target="_blank"> Tripwire</a>
