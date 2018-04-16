@@ -11,7 +11,7 @@ from auth.hr import Application as hr_blueprint
 from auth.models import *
 from auth.util import Util
 
-from preston.esi import Preston
+from preston import Preston
 
 # -- Initialisation -- #
 
