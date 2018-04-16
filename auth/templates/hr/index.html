@@ -4,5 +4,23 @@
 {% endblock head %}
 
 {% block content %}
-<h2>Human Resources</h2>
+<h2>Apply to a corporation</h2>
+<br>
+<div class="container">
+    <div class="card-deck">
+		{% for corporation in open_corporations %}
+			<div class="card mb-4" style="max-width: 32em">
+				<div class="card-header text-center"><h3><img src="{{ corporation.logo }}" alt="{{ corporation.name }}" width=50 height=50> {{ corporation.name }}</h3></div>
+				<div class="card-body text-center">{{ corporation.inhouse_description }}</div>
+				<div class="card-footer text-center"><a href="#" class="btn btn-outline-dark" role="button">Apply to {{ corporation.name }}</a></div>
+			</div>
+			{% if ((loop.index -1) % 2) == 1 %}
+		        <div class="w-100 d-none d-sm-block d-md-none"><!-- wrap every 2 on sm--></div>
+		        <div class="w-100 d-none d-md-block d-lg-none"><!-- wrap every 3 on md--></div>
+				<div class="w-100 d-none d-lg-block d-xl-none"><!-- wrap every 4 on lg--></div>
+				<div class="w-100 d-none d-xl-block"><!-- wrap every 5 on xl--></div>
+			{% endif %}
+		{% endfor %}
+    </div>
+</div>
 {% endblock content %}
