@@ -4,6 +4,8 @@ from auth.models import *
 from auth.admin.forms import *
 from auth.shared import EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
+from preston import Preston
+
 # Create and configure app
 Application = Blueprint('admin', __name__, template_folder='templates/admin', static_folder='static')
 
@@ -249,7 +251,8 @@ def sync_corp_membership(corporation):
     current_app.logger.info("Syncing {} membership ...".format(corporation.name))
 
     # Update access token
-    corporation.access_token = EveAPI["corp_preston"].use_refresh_token(corporation.refresh_token).access_token
+    EveAPI["corp_preston"].refresh_token = corporation.refresh_token
+    corporation.access_token = EveAPI["corp_preston"]._get_access_from_refresh()[0]
 
     # Get members in corp
     membersPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/members/?datasource=tranquility&token={}".format(
