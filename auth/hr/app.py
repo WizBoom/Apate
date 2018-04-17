@@ -26,6 +26,7 @@ def index():
 
 
 @Application.route('/apply/<int:corporation_id>')
+@login_required
 def apply(corporation_id):
     """Apply page of a specific corporation.
 
