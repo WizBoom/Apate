@@ -165,6 +165,10 @@ class Application(Database.Model):
     id = Database.Column(Database.Integer, primary_key=True)
     character_id = Database.Column(Database.Integer, Database.ForeignKey(Character.id))
     character = Database.relationship("Character", backref="Applications")
+    ready_accepted = Database.Column(Database.Boolean)
+
+    def __init__(self):
+        self.ready_accepted = False
 
     def __repr__(self):
         return '<Application-{}>'.format(str(self.character.name))
