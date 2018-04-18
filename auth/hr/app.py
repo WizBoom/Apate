@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, current_app, flash, url_for, redirect
+from flask import Blueprint, render_template, current_app, flash, url_for, redirect, request
 from flask_login import login_required, current_user
 from auth.models import Application as ApplicationModel, Corporation, Alliance
-from auth.shared import Database
+from auth.shared import Database, EveAPI
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -88,7 +88,7 @@ def apply(corporation_id):
     return redirect(url_for('hr.index'))
 
 
-@Application.route('/application_helper/<int:corporation_id>')
+@Application.route('/application_helper/<int:corporation_id>', methods=['GET', 'POST'])
 @login_required
 def application_help(corporation_id):
     """Application helper. This is used when the applying
@@ -102,7 +102,14 @@ def application_help(corporation_id):
     Returns:
         str: redirect to the appropriate url.
     """
-    return render_template('hr/application_helper.html')
+
+    if request.method == 'POST':
+        if request.form['btn'] == "RemoveESI":
+            current_user.access_token = None
+            current_user.refresh_token = None
+            Database.session.commit()
+
+    return render_template('hr/application_helper.html', sso_url=EveAPI['full_auth_preston'].get_authorize_url() + "&state=" + request.url)
 
 
 @Application.route('/view_application')

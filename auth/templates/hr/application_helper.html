@@ -5,4 +5,44 @@
 
 {% block content %}
 <h2>Application Helper</h2>
+<table class="table borderless">
+  <thead>
+    <tr>
+	    <th width="15%" scope="col"></th>
+	    <th width="20%" scope="col"></th>
+	    <th width="55%" scope="col"></th>
+	    <th width="10%" scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      	<th scope="row">Character</th>
+      	<td>{{ current_user.name }}</td>
+      	<td></td>
+      	<td></td>
+    </tr>
+    <tr>
+      	<th scope="row">ESI</th>
+      	{% if not current_user.refresh_token or not current_user.access_token %}
+      	<td><a href="{{ sso_url }}"><img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"></a></td>
+      	{% else %}
+      	<td><strong>PROVIDED</strong></td>
+      	{% endif %}
+      	<td>This is the description for why we need this.</td>
+      	{% if not current_user.refresh_token or not current_user.access_token %}
+      	<td></td>
+      	{% else %}
+      	<form method="POST">
+			<td><button type="submit" value="RemoveESI" name="btn" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Remove ESI authorization." aria-pressed="true">Remove</button></td>
+	  	</form>
+      	{% endif %}
+    </tr>
+    <tr>
+      	<th scope="row">Reddit</th>
+      	<td>Reddit name</td>
+      	<td>This is the description for why we need this.</td>
+		<td><a class="btn btn-outline-danger btn-sm" href="#" role="button" aria-pressed="true">Remove</a></td>
+    </tr>
+  </tbody>
+</table>
 {% endblock content %}

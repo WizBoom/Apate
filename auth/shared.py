@@ -8,5 +8,6 @@ SharedInfo = {
 EveAPI = {
     'user_agent': "",
     'default_user_preston': None,
-    'corp_preston': None
+    'corp_preston': None,
+    'full_auth_preston': None
 }
