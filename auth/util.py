@@ -70,7 +70,7 @@ class Util:
             return None
 
         # Make character
-        character = Character(character_id, characterJson['name'], main_id if main_id is not None else character_id)
+        character = Character(character_id, characterJson['name'], main_id if main_id is not None else character_id, "https://imageserver.eveonline.com/Character/{}_128.jpg".format(str(character_id)))
         Database.session.add(character)
 
         # Create corporation

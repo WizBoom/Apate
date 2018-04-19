@@ -25,12 +25,14 @@ class Character(Database.Model):
     access_token = Database.Column(Database.String)
     refresh_token = Database.Column(Database.String)
     reddit = Database.Column(Database.String)
+    portrait = Database.Column(Database.String)
     application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
-    def __init__(self, id, name, main_id):
+    def __init__(self, id, name, main_id, portrait):
         self.id = id
         self.name = name
         self.main_id = main_id
+        self.portrait = portrait
 
     @property
     def is_authenticated(self):

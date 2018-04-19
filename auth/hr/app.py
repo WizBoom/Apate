@@ -143,6 +143,12 @@ def view_application():
     if current_user.application is None:
         flash("You have no pending application.", 'danger')
         current_app.logger.info("{} tried to access application when they didn't have an application.".format(current_user.name))
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('hr.index'))
 
-    return render_template('hr/application.html')
+    if request.method == 'POST':
+        if request.form['btn'] == "RemoveApplication":
+            Database.session.delete(current_user.application)
+            Database.session.commit()
+            return redirect(url_for('hr.index'))
+
+    return render_template('hr/application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
