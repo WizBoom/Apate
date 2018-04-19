@@ -24,6 +24,7 @@ class Character(Database.Model):
     admin_corp_id = Database.Column(Database.Integer)
     access_token = Database.Column(Database.String)
     refresh_token = Database.Column(Database.String)
+    reddit = Database.Column(Database.String)
     application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, id, name, main_id):

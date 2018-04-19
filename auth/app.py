@@ -11,6 +11,7 @@ from auth.hr import Application as hr_blueprint
 from auth.models import *
 from auth.util import Util
 
+import praw
 from preston import Preston
 
 # -- Initialisation -- #
@@ -68,6 +69,14 @@ EveAPI["full_auth_preston"] = Preston(
     client_secret=FlaskApplication.config['EVE_FULL_AUTH_SECRET'],
     callback_url=FlaskApplication.config['BASE_URL'] + "/eve/user/auth/callback",
     scope="esi-calendar.read_calendar_events.v1 esi-location.read_location.v1 esi-location.read_ship_type.v1 esi-mail.read_mail.v1 esi-skills.read_skills.v1 esi-skills.read_skillqueue.v1 esi-wallet.read_character_wallet.v1 esi-clones.read_clones.v1 esi-characters.read_contacts.v1 esi-universe.read_structures.v1 esi-bookmarks.read_character_bookmarks.v1 esi-killmails.read_killmails.v1 esi-assets.read_assets.v1 esi-planets.manage_planets.v1 esi-fleets.read_fleet.v1 esi-fittings.read_fittings.v1 esi-markets.structure_markets.v1 esi-characters.read_loyalty.v1 esi-characters.read_opportunities.v1 esi-characters.read_chat_channels.v1 esi-characters.read_medals.v1 esi-characters.read_standings.v1 esi-characters.read_agents_research.v1 esi-industry.read_character_jobs.v1 esi-markets.read_character_orders.v1 esi-characters.read_blueprints.v1 esi-characters.read_corporation_roles.v1 esi-location.read_online.v1 esi-contracts.read_character_contracts.v1 esi-clones.read_implants.v1 esi-characters.read_fatigue.v1 esi-characters.read_notifications.v1 esi-industry.read_character_mining.v1 esi-characters.read_titles.v1 esi-characters.read_fw_stats.v1 esi-characterstats.read.v1"
+)
+
+# Reddit connection
+SharedInfo['reddit'] = praw.Reddit(
+    client_id=FlaskApplication.config['REDDIT_OAUTH_CLIENT_ID'],
+    client_secret=FlaskApplication.config['REDDIT_OAUTH_SECRET'],
+    redirect_uri=FlaskApplication.config['BASE_URL'] + "/reddit/callback",
+    user_agent=FlaskApplication.config['REDDIT_USER_AGENT']
 )
 
 # Jinja global variables
@@ -207,6 +216,27 @@ def eve_oath_full_callback():
     FlaskApplication.logger.info("{} succesfully updated ESI for {} with access token {} and refresh token {}".format(
         current_user.name, current_user.name, str(auth.access_token), str(auth.refresh_token)))
     flash('Succesfully provided ESI.', 'success')
+
+    return redirect(request.args.get('state'))
+
+
+@FlaskApplication.route('/reddit/callback')
+@login_required
+def reddit_oath_callback():
+    """Completes the reddit SSO login for a user.
+    Here a user's reddit account gets set.
+
+    Args:
+        None
+
+    Returns:
+        str: If nothing went wrong, redirect to the place they came from.
+    """
+    SharedInfo['reddit'].auth.authorize(request.args['code'])
+    current_user.reddit = str(SharedInfo['reddit'].user.me())
+    Database.session.commit()
+    FlaskApplication.logger.info("{} succesfully updated Reddit (/u/{})".format(current_user.name, current_user.reddit))
+    flash("Successfully linked reddit account {}".format(current_user.reddit), 'success')
 
     return redirect(request.args.get('state'))
 

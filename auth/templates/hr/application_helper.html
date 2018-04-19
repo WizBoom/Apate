@@ -5,6 +5,7 @@
 
 {% block content %}
 <h2>Application Helper</h2>
+<h4>Please fill out the required information below.</h4>
 <table class="table borderless">
   <thead>
     <tr>
@@ -26,23 +27,48 @@
       	{% if not current_user.refresh_token or not current_user.access_token %}
       	<td><a href="{{ sso_url }}"><img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"></a></td>
       	{% else %}
-      	<td><strong>PROVIDED</strong></td>
+      	<td>Provided</td>
       	{% endif %}
       	<td>This is the description for why we need this.</td>
       	{% if not current_user.refresh_token or not current_user.access_token %}
       	<td></td>
       	{% else %}
       	<form method="POST">
-			<td><button type="submit" value="RemoveESI" name="btn" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Remove ESI authorization." aria-pressed="true">Remove</button></td>
+			<td><button type="submit" value="RemoveESI" name="btn" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Remove ESI authorization" aria-pressed="true">Remove</button></td>
 	  	</form>
       	{% endif %}
     </tr>
     <tr>
       	<th scope="row">Reddit</th>
-      	<td>Reddit name</td>
+      	{% if current_user.reddit %}
+			<td>{{ current_user.reddit }}</td>
+      	{% else %}
+      		<td><a href="{{ reddit_url }}" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Link Reddit</a></td>
+      	{% endif %}
       	<td>This is the description for why we need this.</td>
-		<td><a class="btn btn-outline-danger btn-sm" href="#" role="button" aria-pressed="true">Remove</a></td>
+      	{% if not current_user.reddit %}
+      	<td></td>
+      	{% else %}
+      	<form method="POST">
+			<td><button type="submit" value="RemoveReddit" name="btn" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Remove Reddit" aria-pressed="true">Remove</button></td>
+	  	</form>
+      	{% endif %}
     </tr>
   </tbody>
 </table>
+{% if current_user.refresh_token and current_user.access_token and current_user.reddit %}
+	<a href="{{ redirect_url }}" class="btn btn-outline-success" role="button" aria-pressed="true">Complete application</a>
+{% else %}
+	<ul class="list-unstyled text-danger">
+		{% if not current_user.reddit %}
+		  <li>Missing reddit account</li>
+		{% endif %}
+		{% if not current_user.refresh_token and not current_user.access_token %}
+		  <li>Missing ESI authorization</li>
+		{% endif %}
+	</ul>
+{% endif %}
+<br><br><br><br>
+<p>If you have any questions, you can join our public Discord and ask for help by typing @Recruiters followed by your question.</p>
+<a class="btn btn btn-dark" target="_blank" href="{{ discord_url }}" role="button" aria-pressed="true">Join Discord</a>
 {% endblock content %}

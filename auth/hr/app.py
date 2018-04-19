@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, current_app, flash, url_for, redirect, request
 from flask_login import login_required, current_user
 from auth.models import Application as ApplicationModel, Corporation, Alliance
-from auth.shared import Database, EveAPI
+from auth.shared import Database, EveAPI, SharedInfo
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -74,7 +74,7 @@ def apply(corporation_id):
         return redirect(url_for('hr.view_application'))
 
     # Check if all necessary info is provided
-    if not current_user.refresh_token or not current_user.access_token:
+    if not current_user.refresh_token or not current_user.access_token or not current_user.reddit:
         return redirect(url_for('hr.application_help', corporation_id=corporation.id))
 
     # Make application
@@ -108,8 +108,17 @@ def application_help(corporation_id):
             current_user.access_token = None
             current_user.refresh_token = None
             Database.session.commit()
+            flash('Successfully removed ESI authorization.', 'success')
+            current_app.logger.info('{} removed ESI authorization.'.format(current_user.name))
+        elif request.form['btn'] == "RemoveReddit":
+            oldReddit = current_user.reddit
+            current_user.reddit = None
+            flash('Successfully removed Reddit account', 'success')
+            current_app.logger.info('{} removed Reddit account ({})'.format(current_user.name, oldReddit))
 
-    return render_template('hr/application_helper.html', sso_url=EveAPI['full_auth_preston'].get_authorize_url() + "&state=" + request.url)
+    return render_template('hr/application_helper.html', sso_url=EveAPI['full_auth_preston'].get_authorize_url() + "&state=" + request.url,
+                           reddit_url=SharedInfo['reddit'].auth.url(['identity'], request.url, 'temporary'), discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'],
+                           redirect_url=url_for('hr.apply', corporation_id=corporation_id))
 
 
 @Application.route('/view_application')
