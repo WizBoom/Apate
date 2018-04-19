@@ -29,7 +29,7 @@
       	{% else %}
       	<td>Provided</td>
       	{% endif %}
-      	<td>This is the description for why we need this.</td>
+      	<td>This will be the information that is used to review your application, so we can check if you're not a spy. All of the endpoints you provide are read-only.</td>
       	{% if not current_user.refresh_token or not current_user.access_token %}
       	<td></td>
       	{% else %}
@@ -45,7 +45,7 @@
       	{% else %}
       		<td><a href="{{ reddit_url }}" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Link Reddit</a></td>
       	{% endif %}
-      	<td>This is the description for why we need this.</td>
+      	<td>We require a reddit account as we use a private subreddit to post our announcements / after-action-reports. The account you link here can be a throw-away, as long as you are able to log into it. If you don't have a reddit account, you can make one at <a href="https://www.reddit.com/" target="_blank">here</a>.</td>
       	{% if not current_user.reddit %}
       	<td></td>
       	{% else %}
