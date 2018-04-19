@@ -105,7 +105,9 @@ def application_help(corporation_id):
 
     # Check if character already has an application
     if current_user.application is not None:
-        return redirect(url_for('landing'))
+        flash("You already have an application.", 'danger')
+        current_app.logger.info("{} tried to access application helper when they had an application.".format(current_user.name))
+        return redirect(url_for('hr.view_application'))
 
     if request.method == 'POST':
         if request.form['btn'] == "RemoveESI":
@@ -125,7 +127,7 @@ def application_help(corporation_id):
                            redirect_url=url_for('hr.apply', corporation_id=corporation_id))
 
 
-@Application.route('/view_application')
+@Application.route('/view_application', methods=['GET', 'POST'])
 @login_required
 def view_application():
     """Views the application of the current user.
@@ -136,4 +138,11 @@ def view_application():
     Returns:
         str: redirect to the appropriate url.
     """
+
+    # Check if character has an application
+    if current_user.application is None:
+        flash("You have no pending application.", 'danger')
+        current_app.logger.info("{} tried to access application when they didn't have an application.".format(current_user.name))
+        return redirect(url_for('auth.index'))
+
     return render_template('hr/application.html')
