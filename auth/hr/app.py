@@ -103,6 +103,10 @@ def application_help(corporation_id):
         str: redirect to the appropriate url.
     """
 
+    # Check if character already has an application
+    if current_user.application is not None:
+        return redirect(url_for('landing'))
+
     if request.method == 'POST':
         if request.form['btn'] == "RemoveESI":
             current_user.access_token = None
