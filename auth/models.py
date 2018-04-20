@@ -1,4 +1,5 @@
 from .shared import Database, SharedInfo
+from datetime import datetime
 
 # -- Connections -- #
 permissionConnection = Database.Table(
@@ -169,6 +170,7 @@ class Role(Database.Model):
 class Application(Database.Model):
     __tablename__ = 'Applications'
     id = Database.Column(Database.Integer, primary_key=True)
+    timestamp = Database.Column(Database.DateTime)
     character_id = Database.Column(Database.Integer, Database.ForeignKey(Character.id))
     character = Database.relationship("Character", backref="Applications")
     corporation_id = Database.Column(Database.Integer, Database.ForeignKey(Corporation.id), nullable=False)
@@ -176,6 +178,7 @@ class Application(Database.Model):
     ready_accepted = Database.Column(Database.Boolean)
 
     def __init__(self, corporation):
+        self.timestamp = datetime.utcnow()
         self.corporation = corporation
         self.ready_accepted = False
 

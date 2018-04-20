@@ -24,12 +24,12 @@
 {% block content %}
 <h2>Corporation Applications</h2>
 <div class="table-responsive">
-	<table class="table">
+	<table class="table borderless">
 		<thead>
 			<tr>
 				<th scope="col"></th>
 				<th scope="col">Name</th>
-				<th scope="col">Application age (Days)</th>
+				<th scope="col">Creation Date</th>
 				<th scope="col">Status</th>
 				<th scope="col">Reddit</th>
 				<th scope="col"></th>
@@ -42,9 +42,9 @@
 			<tr>
 				<td><img class="rounded-circle" src="{{ application.character.portrait }}" alt="Portrait" width=30 height=30></td>
 				<td>{{application.character.name}}</td>
-				<td class="text-center">3</td>
+				<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
 				<td>{% if application.ready_accepted %}Ready to be accepted{% else %}Being processed{% endif %}</td>
-				<td>{{application.character.reddit}}</td>
+				<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
 				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View ESI</a></td>
 				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Killboard</a></td>
 				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Full Application</a></td>
