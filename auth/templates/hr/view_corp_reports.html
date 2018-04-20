@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_reports') }}">Reports</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>Corporation Reports</h2>
+{% endblock content %}

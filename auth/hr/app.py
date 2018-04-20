@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, current_app, flash, url_for, redir
 from flask_login import login_required, current_user
 from auth.models import Application as ApplicationModel, Corporation, Alliance
 from auth.shared import Database, EveAPI, SharedInfo
+from auth.decorators import needs_permission, alliance_required
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -152,3 +153,54 @@ def view_application():
             return redirect(url_for('hr.index'))
 
     return render_template('hr/application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+
+
+@Application.route('/view_corp_applications')
+@login_required
+@alliance_required()
+@needs_permission('read_applications', 'View Corporation Applications')
+def view_corp_applications():
+    """Views all the applications to the current corp.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    return render_template('hr/view_corp_applications.html', corporation=current_user.get_corp())
+
+
+@Application.route('/view_corp_reports')
+@login_required
+@alliance_required()
+@needs_permission('read_applications', 'View Corporation Reports')
+def view_corp_reports():
+    """Views all the reports from the current corp.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    return render_template('hr/view_corp_reports.html', corporation=current_user.get_corp())
+
+
+@Application.route('/view_corp_members')
+@login_required
+@alliance_required()
+@needs_permission('read_membership', 'View Corporation Members')
+def view_corp_members():
+    """Views all the members from the current corp.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())

@@ -3,6 +3,24 @@
 {% block head %}
 {% endblock head %}
 
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_reports') }}">Reports</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
 {% block content %}
 <h2>Application</h2>
 <p>Please join our recruitment Discord server to set a time for your interview. Once in the server, type '@Recruiters' to notify the recruiters that you are available for an interview. An interviewer will help you out if one is available. If no one responds, try again in a couple of hours. Please make sure you set a push-to-talk button, and that you said your nickname to your character's name. You can set your nickname by typing '/nick', followed by the character name.</p>
