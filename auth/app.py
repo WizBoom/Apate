@@ -122,7 +122,11 @@ def landing():
     Returns:
         str: redirect to the appropriate url.
     """
-    return render_template('landing.html')
+
+    # Find main alliance
+    alliance = Alliance.query.filter_by(id=SharedInfo['alliance_id']).first()
+
+    return render_template('landing.html', alliance=alliance)
 
 
 @FlaskApplication.route('/eve/user/default/callback')
