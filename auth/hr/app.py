@@ -152,7 +152,7 @@ def view_application():
             Database.session.commit()
             return redirect(url_for('hr.index'))
 
-    return render_template('hr/application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+    return render_template('hr/personal_application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
 
 
 @Application.route('/view_corp_applications')
