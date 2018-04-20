@@ -22,11 +22,17 @@ class Character(Database.Model):
     main_id = Database.Column(Database.Integer)
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
     admin_corp_id = Database.Column(Database.Integer)
+    access_token = Database.Column(Database.String)
+    refresh_token = Database.Column(Database.String)
+    reddit = Database.Column(Database.String)
+    portrait = Database.Column(Database.String)
+    application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
-    def __init__(self, id, name, main_id):
+    def __init__(self, id, name, main_id, portrait):
         self.id = id
         self.name = name
         self.main_id = main_id
+        self.portrait = portrait
 
     @property
     def is_authenticated(self):
@@ -110,6 +116,7 @@ class Corporation(Database.Model):
     refresh_token = Database.Column(Database.String)
     alliance_id = Database.Column(Database.Integer, Database.ForeignKey('Alliances.id'))
     characters = Database.relationship('Character', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
+    applications = Database.relationship('Application', backref='Corporation', lazy='dynamic', cascade="all, delete-orphan")
 
     def get_alliance(self):
         return Alliance.query.filter_by(id=self.alliance_id).first()
@@ -157,4 +164,21 @@ class Role(Database.Model):
         # Get permission list
         permissionNames = [permission.name.lower() for permission in self.permissions]
         return permission_name.lower() in permissionNames
+
+
+class Application(Database.Model):
+    __tablename__ = 'Applications'
+    id = Database.Column(Database.Integer, primary_key=True)
+    character_id = Database.Column(Database.Integer, Database.ForeignKey(Character.id))
+    character = Database.relationship("Character", backref="Applications")
+    corporation_id = Database.Column(Database.Integer, Database.ForeignKey(Corporation.id), nullable=False)
+    corporation = Database.relationship('Corporation', backref='Applications')
+    ready_accepted = Database.Column(Database.Boolean)
+
+    def __init__(self, corporation):
+        self.corporation = corporation
+        self.ready_accepted = False
+
+    def __repr__(self):
+        return '<Application-{}-{}>'.format(self.corporation.name, self.character.name)
 # -- End Classes -- #
