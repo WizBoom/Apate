@@ -64,7 +64,7 @@ class Character(Database.Model):
         return [alt for alt in Character.query.filter_by(main_id=self.id) if alt.main_id != alt.id]
 
     def get_main(self):
-        return Character.filter_by(id=self.main_id).first()
+        return Character.query.filter_by(id=self.main_id).first()
 
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
@@ -74,6 +74,20 @@ class Character(Database.Model):
 
         # If nothing was found, return false
         return False
+
+    def get_errors(self):
+        errors = []
+
+        if self.access_token is None or self.refresh_token is None:
+            errors.append("No valid ESI authorization provided.")
+
+        if self.reddit is None:
+            errors.append("No reddit account provided.")
+
+        if not self.get_main().is_in_alliance:
+            errors.append("Main {} is not a member of this alliance.".format(self.get_main().name))
+
+        return errors
 
     @property
     def is_in_alliance(self):

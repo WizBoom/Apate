@@ -24,7 +24,7 @@
 {% block content %}
 <h2>{{ corporation.name }} Members</h2>
 <div class="table-responsive">
-	<table class="table borderless">
+	<table class="table borderless table-hover">
 		<thead>
 			<tr>
 				<th scope="col"></th>
@@ -32,14 +32,17 @@
 				<th scope="col">Reddit</th>
 				<th scope="col">SP</th>
 				<th scope="col">Wallet</th>
-				<th scope="col"></th>
-				<th scope="col"></th>
+				<th scope="col">Type</th>
 				<th scope="col"></th>
 			</tr>
 		</thead>
 		<tbody>
 		{% for character in corporation.characters|sort(attribute='name') %}
-			<tr>
+			{% if character.get_errors() %}
+				<tr class="table-danger" data-toggle="tooltip" title="{{ character.get_errors()|join('\n')}}">
+			{% else %}
+				<tr>
+			{% endif %}
 				<td><img class="rounded-circle" src="{{ character.portrait }}" alt="Portrait" width=30 height=30></td>
 				<td>{{ character.name}}</td>
 				{% if character.reddit %}
@@ -48,10 +51,14 @@
 					<td><strong>No Reddit</strong></td>
 				{% endif %}
 				<td>58.000.000</td>
-				<td>100.000.000,00 ISK</td>
-				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View ESI</a></td>
-				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Killboard</a></td>
-				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Details</a></td>
+				<td>10.000.000.000 ISK</td>
+				
+				{% if character.main_id == character.id %}
+					<td>Main</td>
+				{% else %}
+					<td>Alt of {{ character.get_main().name }}</td>
+				{% endif %}
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">Details</a></td>
 			</tr>
 		{% endfor %}
 		</tbody>
