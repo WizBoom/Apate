@@ -189,12 +189,12 @@ def view_corp_members():
     return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())
 
 
-@Application.route('/view_application/<int:application_id>')
+@Application.route('/view_member/<int:member_id>')
 @login_required
 @alliance_required()
-@needs_permission('read_applications', 'View Application')
+@needs_permission('read_applications', 'View Member')
 def view_application(application_id):
-    """Views an application with ID.
+    """Views a member with ID.
 
     Args:
         application_id (int): ID of the application.
