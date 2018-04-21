@@ -172,23 +172,6 @@ def view_corp_applications():
     return render_template('hr/view_corp_applications.html', corporation=current_user.get_corp())
 
 
-@Application.route('/view_corp_reports')
-@login_required
-@alliance_required()
-@needs_permission('read_applications', 'View Corporation Reports')
-def view_corp_reports():
-    """Views all the reports from the current corp.
-
-    Args:
-        None
-
-    Returns:
-        str: redirect to the appropriate url.
-    """
-
-    return render_template('hr/view_corp_reports.html', corporation=current_user.get_corp())
-
-
 @Application.route('/view_corp_members')
 @login_required
 @alliance_required()
