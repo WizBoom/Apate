@@ -22,5 +22,39 @@
 {% endblock %}
 
 {% block content %}
-<h2>Corporation Members</h2>
+<h2>{{ corporation.name }} Members</h2>
+<div class="table-responsive">
+	<table class="table borderless">
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				<th scope="col">Name</th>
+				<th scope="col">Reddit</th>
+				<th scope="col">SP</th>
+				<th scope="col">Wallet</th>
+				<th scope="col"></th>
+				<th scope="col"></th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for character in corporation.characters|sort(attribute='name') %}
+			<tr>
+				<td><img class="rounded-circle" src="{{ character.portrait }}" alt="Portrait" width=30 height=30></td>
+				<td>{{ character.name}}</td>
+				{% if character.reddit %}
+					<td><a href="https://www.reddit.com/u/{{character.reddit}}" target="_blank">{{ character.reddit }}</a></td>
+				{% else %}
+					<td><strong>No Reddit</strong></td>
+				{% endif %}
+				<td>58.000.000</td>
+				<td>100.000.000,00 ISK</td>
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View ESI</a></td>
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Killboard</a></td>
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View Details</a></td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
 {% endblock content %}
