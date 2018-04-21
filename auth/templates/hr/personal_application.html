@@ -33,6 +33,10 @@
 		      	<th scope="row">Current Corp</th>
 		      	<td>{{ current_user.get_corp().name }}</td>
 		    </tr>
+			<tr>
+		      	<th scope="row">Creation Date</th>
+				<td>{{ current_user.application.timestamp.strftime('%Y/%m/%d') }}</td>
+		    </tr>
 		    <tr>
 		      	<th scope="row">Status</th>
 		      	<td>

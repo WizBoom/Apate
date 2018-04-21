@@ -14,7 +14,7 @@
   	{% if not current_user.is_authenticated %}
 		<a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg" role="button" aria-disabled="true">Login</a>
 	{% elif current_user.application %}
-		<a href="{{ url_for('hr.view_application') }}" class="btn btn-outline-dark btn-lg" role="button" aria-disabled="true">View application to {{ current_user.application.corporation.name }}</a>
+		<a href="{{ url_for('hr.personal_application') }}" class="btn btn-outline-dark btn-lg" role="button" aria-disabled="true">View application to {{ current_user.application.corporation.name }}</a>
 	{% else %}
 		<a href="{{ url_for('hr.index') }}" class="btn btn-outline-dark btn-lg" role="button" aria-disabled="true">Apply to corp in {{ alliance.name }}</a>
 	{% endif %}

@@ -18,7 +18,13 @@ class Util:
             response: Returns the ESI response object.
         """
         self.Application.logger.debug("make_esi_request > Making ESI request: " + request_link)
-        return requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
+
+        esiRequest = requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
+
+        if esiRequest.status_code != 200:
+                self.Application.logger.error('make_esi_request > ESI request threw error {}'.format(str(corporationPayload.status_code)))
+
+        return esiRequest
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new

@@ -128,9 +128,9 @@ def application_help(corporation_id):
                            redirect_url=url_for('hr.apply', corporation_id=corporation_id))
 
 
-@Application.route('/view_application', methods=['GET', 'POST'])
+@Application.route('/personal_application', methods=['GET', 'POST'])
 @login_required
-def view_application():
+def personal_application():
     """Views the application of the current user.
 
     Args:
@@ -187,3 +187,29 @@ def view_corp_members():
     """
 
     return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())
+
+
+@Application.route('/view_application/<int:application_id>')
+@login_required
+@alliance_required()
+@needs_permission('read_applications', 'View Application')
+def view_application(application_id):
+    """Views an application with ID.
+
+    Args:
+        application_id (int): ID of the application.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    # Get application.
+    application = ApplicationModel.query.filter_by(id=application_id).first()
+
+    # Redirect if application does not exist.
+    if not application:
+        flash("Application with ID {} is not present in the database.".format(str(application_id)), 'danger')
+        current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
+        return redirect(url_for('hr.index'))
+
+    return render_template('hr/view_application.html', application=application)
