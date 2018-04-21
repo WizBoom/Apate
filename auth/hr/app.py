@@ -194,7 +194,7 @@ def view_corp_members():
 @alliance_required()
 @needs_permission('read_applications', 'View Member')
 def view_application(application_id):
-    """Views a member with ID.
+    """Views an application with ID.
 
     Args:
         application_id (int): ID of the application.
