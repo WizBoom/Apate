@@ -189,7 +189,7 @@ def view_corp_members():
     return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())
 
 
-@Application.route('/view_member/<int:member_id>')
+@Application.route('/view_application/<int:application_id>')
 @login_required
 @alliance_required()
 @needs_permission('read_applications', 'View Member')
