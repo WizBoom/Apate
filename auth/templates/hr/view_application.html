@@ -53,9 +53,13 @@
 			<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
 		</div>
 		<div class="card-footer text-center">
-			<form method="POST">
-				<td><button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button></td>
-			</form>
+			{% if personal_application %}
+				<form method="POST">
+					<button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
+				</form>
+			{% else %}
+				<td><button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removeApplicationModal">Remove application</button></td>
+			{% endif %}
 		</div>
 	</div>
 	{% if personal_application %}
@@ -64,3 +68,26 @@
 		<a class="btn btn btn-dark" target="_blank" href="{{ discord_url }}" role="button" aria-pressed="true">Join Discord</a>
 	{% endif %}
 {% endblock content %}
+
+{% block modals %}
+	<div class="modal fade" id="removeApplicationModal" tabindex="-1" role="dialog" aria-labelledby="applicationRemovalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="applicationRemovalLongTitle">Removal reason</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        REASON
+	      </div>
+	      <div class="modal-footer">
+				<form method="POST">
+					<button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
+				</form>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+{% endblock modals %}

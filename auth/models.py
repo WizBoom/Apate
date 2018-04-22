@@ -27,6 +27,7 @@ class Character(Database.Model):
     refresh_token = Database.Column(Database.String)
     reddit = Database.Column(Database.String)
     portrait = Database.Column(Database.String)
+    notes = Database.Column(Database.String)
     application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, id, name, main_id, portrait):
