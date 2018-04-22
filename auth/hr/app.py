@@ -194,6 +194,7 @@ def view_application(application_id):
         current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
         return redirect(url_for('hr.index'))
 
+    # Removal of applications.
     if request.method == 'POST':
         if request.form['btn'] == "RemoveApplication":
             characterName = application.character.name
