@@ -22,7 +22,7 @@ def index():
 
     # If user already has an application, view that instead
     if current_user.application:
-        return redirect(url_for('hr.view_application'))
+        return redirect(url_for('hr.view_application', application_id=current_user.application.id))
 
     # Get all corporations that are open for recruitment.
     openCorporations = [corp for corp in Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first().corporations if corp.recruitment_open]
@@ -128,33 +128,6 @@ def application_help(corporation_id):
                            redirect_url=url_for('hr.apply', corporation_id=corporation_id))
 
 
-@Application.route('/personal_application', methods=['GET', 'POST'])
-@login_required
-def personal_application():
-    """Views the application of the current user.
-
-    Args:
-        None
-
-    Returns:
-        str: redirect to the appropriate url.
-    """
-
-    # Check if character has an application
-    if current_user.application is None:
-        flash("You have no pending application.", 'danger')
-        current_app.logger.info("{} tried to access application when they didn't have an application.".format(current_user.name))
-        return redirect(url_for('hr.index'))
-
-    if request.method == 'POST':
-        if request.form['btn'] == "RemoveApplication":
-            Database.session.delete(current_user.application)
-            Database.session.commit()
-            return redirect(url_for('hr.index'))
-
-    return render_template('hr/personal_application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
-
-
 @Application.route('/view_corp_applications')
 @login_required
 @alliance_required()
@@ -189,10 +162,8 @@ def view_corp_members():
     return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())
 
 
-@Application.route('/view_application/<int:application_id>')
+@Application.route('/view_application/<int:application_id>', methods=['GET', 'POST'])
 @login_required
-@alliance_required()
-@needs_permission('read_applications', 'View Member')
 def view_application(application_id):
     """Views an application with ID.
 
@@ -203,8 +174,19 @@ def view_application(application_id):
         str: redirect to the appropriate url.
     """
 
-    # Get application.
+    # Get user application.
     application = ApplicationModel.query.filter_by(id=application_id).first()
+    isPersonalApplication = False
+
+    # check if application is a personal application.
+    if current_user.application and current_user.application.id == application_id:
+        isPersonalApplication = True
+
+    # Check if user is viewing a personal application or someone else's application.
+    if not isPersonalApplication and not current_user.has_permission('read_applications'):
+        flash("You do not have the required permission to view other people's applications.", "danger")
+        current_app.logger.info("{} tried to illegally access someone else's application but didn't have the required read_applications permission.".format(current_user.name))
+        return redirect(url_for('hr.index'))
 
     # Redirect if application does not exist.
     if not application:
@@ -212,4 +194,14 @@ def view_application(application_id):
         current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
         return redirect(url_for('hr.index'))
 
-    return render_template('hr/view_application.html', application=application)
+    if request.method == 'POST':
+        if request.form['btn'] == "RemoveApplication":
+            characterName = application.character.name
+            corpName = application.corporation.name
+            Database.session.delete(application)
+            Database.session.commit()
+            flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
+            current_app.logger.info("{} removed application of {} to {}.".format(current_user.name, characterName, corpName))
+            return redirect(url_for('hr.index'))
+
+    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])

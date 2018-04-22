@@ -17,39 +17,50 @@
 {% endblock %}
 
 {% block content %}
-<div class="card bg-light" style="max-width: 40rem;">
-	<div class="card-header"><h3><img class="rounded-circle" src="{{ application.character.portrait }}" alt="{{ application.character.name }} portrait" width=50 height=50> {{ application.character.name }} Application</h3></div>
-	<div class="card-body">
-		<table class="table borderless">
-		    <tr>
-		      	<th width="30%" scope="row">Character Name</th>
-		      	<td width="70%">{{ application.character.name }}</td>
-		    </tr>
-		    <tr>
-		      	<th scope="row">Current Corp</th>
-		      	<td>{{ application.corporation.name }}</td>
-		    </tr>
-		    <tr>
-		      	<th scope="row">Creation Date</th>
-				<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
-		    </tr>
-		    <tr>
-		      	<th scope="row">Status</th>
-		      	<td>
-		      		{% if application.ready_accepted %}
-		      			<p>Ready to be accepted</p>
-		      		{% else %}
-						<p>Being processed</p>
-		      		{% endif %}
-				</td>
-		    </tr>
-		</table>
-		<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
-	</div>
-			<div class="card-footer text-center">
-				<form method="POST">
-					<td><button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button></td>
-				</form>
-		  	</div>
+	<div class="card bg-light" style="max-width: 40rem;">
+		<div class="card-header"><h3><img class="rounded-circle" src="{{ application.character.portrait }}" alt="{{ application.character.name }} portrait" width=50 height=50> {{ application.character.name }} Application</h3></div>
+		<div class="card-body">
+			<table class="table borderless">
+				<tr>
+					<th width="30%" scope="row">Character Name</th>
+					<td width="70%">{{ application.character.name }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Current Corp</th>
+					<td>{{ application.corporation.name }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Creation Date</th>
+					<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
+				</tr>
+				<tr>
+					<th scope="row">Status</th>
+					<td>
+						{% if application.ready_accepted %}
+							Ready to be accepted
+						{% else %}
+							Being processed
+						{% endif %}
+					</td>
+				</tr>
+				{% if personal_application %}
+					<tr>
+						<th scope="row">Account</th>
+						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Account information</a></td>
+					</tr>
+				{% endif %}
+			</table>
+			<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
 		</div>
+		<div class="card-footer text-center">
+			<form method="POST">
+				<td><button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button></td>
+			</form>
+		</div>
+	</div>
+	{% if personal_application %}
+		<br><br>
+		<p>Please join our recruitment Discord server to set a time for your interview. Once in the server, type '@Recruiters' to notify the recruiters that you are available for an interview. An interviewer will help you out if one is available. If no one responds, try again in a couple of hours. Please make sure you set a push-to-talk button, and that you said your nickname to your character's name. You can set your nickname by typing '/nick', followed by the character name.</p>
+		<a class="btn btn btn-dark" target="_blank" href="{{ discord_url }}" role="button" aria-pressed="true">Join Discord</a>
+	{% endif %}
 {% endblock content %}
