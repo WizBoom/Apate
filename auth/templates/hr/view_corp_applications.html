@@ -18,6 +18,9 @@
 
 {% block content %}
 <h2>{{ corporation.name }} Applications</h2>
+{% if not corporation.applications.all() %}
+	<h3>None</h3>
+{% else %}
 <br>
 <div class="table-responsive">
 	<table class="table borderless">
@@ -49,4 +52,5 @@
 		</tbody>
 	</table>
 </div>
+{% endif %}
 {% endblock content %}
