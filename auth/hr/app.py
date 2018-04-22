@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from auth.models import Application as ApplicationModel, Corporation, Alliance
 from auth.shared import Database, EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
+from auth.hr.forms import *
+from datetime import datetime
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -176,6 +178,7 @@ def view_application(application_id):
 
     # Get user application.
     application = ApplicationModel.query.filter_by(id=application_id).first()
+    removeApplicationForm = RemoveApplicationForm()
     isPersonalApplication = False
 
     # check if application is a personal application.
@@ -197,12 +200,34 @@ def view_application(application_id):
     # Removal of applications.
     if request.method == 'POST':
         if request.form['btn'] == "RemoveApplication":
+            # Check if application is valid.
+            if not removeApplicationForm.validate_on_submit():
+                flash('Please make sure you provide a reason when removing an application.', 'danger')
+                return redirect(url_for('hr.view_application', application_id=application.id))
+
             characterName = application.character.name
             corpName = application.corporation.name
+            rejectionReason = removeApplicationForm.rejection_reason.data
+
+            # Add note with rejection reason.
+            application.character.notes += "Application removed ({}) by {}: {} <br>".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
+
             Database.session.delete(application)
             Database.session.commit()
+
+            flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
+            current_app.logger.info("{} removed application of {} to {} with reason '{}'.".format(current_user.name, characterName, corpName, rejectionReason))
+        elif request.form['btn'] == "RemovePersonalApplication":
+            characterName = application.character.name
+            corpName = application.corporation.name
+
+            Database.session.delete(application)
+            Database.session.commit()
+
             flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
             current_app.logger.info("{} removed application of {} to {}.".format(current_user.name, characterName, corpName))
-            return redirect(url_for('hr.index'))
 
-    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+        return redirect(url_for('hr.index'))
+
+    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication, remove_form=removeApplicationForm,
+                           discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])

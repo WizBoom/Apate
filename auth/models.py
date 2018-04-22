@@ -35,6 +35,7 @@ class Character(Database.Model):
         self.name = name
         self.main_id = main_id
         self.portrait = portrait
+        self.notes = ""
 
     @property
     def is_authenticated(self):

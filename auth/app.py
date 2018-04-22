@@ -255,6 +255,9 @@ def logout():
     Returns:
         str: redirect to the login endpoint
     """
+    if current_user.is_anonymous:
+        return redirect(url_for('landing'))
+
     FlaskApplication.logger.debug('{} logged out'.format(current_user.name if not current_user.is_anonymous else 'unknown user'))
     logout_user()
     return redirect(url_for('landing'))
