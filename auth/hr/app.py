@@ -178,10 +178,13 @@ def view_application(application_id):
 
     # Get user application.
     application = ApplicationModel.query.filter_by(id=application_id).first()
-
-    # Make application form
-    removeApplicationForm = RemoveApplicationForm()
     isPersonalApplication = False
+
+    # Redirect if application does not exist.
+    if not application:
+        flash("Application with ID {} is not present in the database.".format(str(application_id)), 'danger')
+        current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
+        return redirect(url_for('hr.index'))
 
     # check if application is a personal application.
     if current_user.application and current_user.application.id == application_id:
@@ -199,14 +202,23 @@ def view_application(application_id):
         current_app.logger.info("{} tried to illegally access someone else's application but didn't have the required read_applications permission.".format(current_user.name))
         return redirect(url_for('hr.index'))
 
-    # Redirect if application does not exist.
-    if not application:
-        flash("Application with ID {} is not present in the database.".format(str(application_id)), 'danger')
-        current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
-        return redirect(url_for('hr.index'))
+    # Make application forms.
+    removeApplicationForm = RemoveApplicationForm()
+    editApplicationForm = EditApplicationForm(notes=application.character.notes)
 
     # Removal of applications.
     if request.method == 'POST':
+        # Check if notes were updated.
+        if 'btn' not in request.form:
+            if 'notes' in request.form and editApplicationForm.validate_on_submit():
+                oldNote = application.character.notes
+                application.character.notes = editApplicationForm.notes.data
+                Database.session.commit()
+                flash("Successfully updated note.", "success")
+                current_app.logger.info("{} updated {}'s note from '{}' to {}.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
+                return redirect(url_for('hr.view_application', application_id=application.id))
+
+        # Check other button presses.
         if request.form['btn'] == "RemoveApplication":
             # Check if application is valid.
             if not removeApplicationForm.validate_on_submit():
@@ -218,7 +230,7 @@ def view_application(application_id):
             rejectionReason = removeApplicationForm.rejection_reason.data
 
             # Add note with rejection reason.
-            application.character.notes += "Application removed ({}) by {}: {} <br>".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
+            application.character.notes += "Application removed ({}) by {}: {}\n".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
 
             Database.session.delete(application)
             Database.session.commit()
@@ -244,5 +256,5 @@ def view_application(application_id):
 
         return redirect(url_for('hr.index'))
 
-    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication, remove_form=removeApplicationForm,
-                           discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication,
+                           remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])

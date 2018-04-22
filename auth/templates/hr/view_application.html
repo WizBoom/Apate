@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<script>
+function process(e, formID) {
+    if(e.which == 13 && !e.shiftKey) {        
+        $(formID).submit();
+        e.preventDefault();
+        return false;
+    }
+}
+</script>
 {% endblock head %}
 
 {% block navbar %}
@@ -48,6 +57,16 @@
 						<th scope="row">Account</th>
 						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Account information</a></td>
 					</tr>
+				{% else %}
+				<tr>
+					<th scope="row">Notes</th>
+					<td>
+					<form id="NoteForm" method="POST">
+						{{ edit_form.csrf_token }}
+						{{ edit_form.notes(class="form-control", onkeypress="process(event,NoteForm,this)") }}
+					</form>
+					</td>
+				</tr>
 				{% endif %}
 			</table>
 			<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
