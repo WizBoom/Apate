@@ -53,13 +53,18 @@
 			<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
 		</div>
 		<div class="card-footer text-center">
-			{% if personal_application %}
-				<form method="POST">
-					<button type="submit" value="RemovePersonalApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
-				</form>
-			{% else %}
-				<td><button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removeApplicationModal">Remove application</button></td>
-			{% endif %}
+			<form method="POST">
+				{% if personal_application %}
+						<button type="submit" value="RemovePersonalApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
+				{% else %}
+					<button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removeApplicationModal">Remove application</button>
+					{% if application.ready_accepted %}
+						<button type="submit" value="UpdateApplication" name="btn" class="btn btn-outline-warning" aria-pressed="true">Set to 'Being processed'</button>
+					{% else %}
+						<button type="submit" value="UpdateApplication" name="btn" class="btn btn-outline-success" aria-pressed="true">Set to 'Ready to be accepted'</button>
+					{% endif %}
+				{% endif %}
+			</form>
 		</div>
 	</div>
 	{% if personal_application %}

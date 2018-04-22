@@ -226,6 +226,13 @@ def view_application(application_id):
 
             flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
             current_app.logger.info("{} removed application of {} to {}.".format(current_user.name, characterName, corpName))
+        elif request.form['btn'] == "UpdateApplication":
+            application.ready_accepted = not application.ready_accepted
+            newStatus = "Ready to be accepted" if application.ready_accepted else "Being processed"
+            Database.session.commit()
+            flash("Successfully set {} application status to {}.".format(application.character.name, newStatus), 'success')
+            current_app.logger.info("{} edited status of {} application to {}".format(current_user.name, application.character.name, newStatus))
+            return redirect(url_for('hr.view_application', application_id=application.id))
 
         return redirect(url_for('hr.index'))
 
