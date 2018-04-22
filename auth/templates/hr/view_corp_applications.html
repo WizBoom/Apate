@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{{ corporation.name }} Applications</h2>
+{% if not corporation.applications.all() %}
+	<h3>None</h3>
+{% else %}
+<br>
+<div class="table-responsive">
+	<table class="table borderless">
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				<th scope="col">Name</th>
+				<th scope="col">Creation Date</th>
+				<th scope="col">Status</th>
+				<th scope="col">Reddit</th>
+				<th scope="col"></th>
+				<th scope="col"></th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for application in corporation.applications %}
+			<tr>
+				<td><img class="rounded-circle" src="{{ application.character.portrait }}" alt="Portrait" width=30 height=30></td>
+				<td>{{application.character.name}}</td>
+				<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
+				<td>{% if application.ready_accepted %}Ready to be accepted{% else %}Being processed{% endif %}</td>
+				<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View ESI</a></td>
+				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="https://zkillboard.com/character/{{ application.character.id }}/" role="button" aria-pressed="true">View Killboard</a></td>
+				<td><a class="btn btn-outline-dark btn-sm" href="{{ url_for('hr.view_application', application_id=application.id) }}" role="button" aria-pressed="true">View Full Application</a></td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+{% endblock content %}

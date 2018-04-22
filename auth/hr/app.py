@@ -2,6 +2,9 @@ from flask import Blueprint, render_template, current_app, flash, url_for, redir
 from flask_login import login_required, current_user
 from auth.models import Application as ApplicationModel, Corporation, Alliance
 from auth.shared import Database, EveAPI, SharedInfo
+from auth.decorators import needs_permission, alliance_required
+from auth.hr.forms import *
+from datetime import datetime
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -21,7 +24,7 @@ def index():
 
     # If user already has an application, view that instead
     if current_user.application:
-        return redirect(url_for('hr.view_application'))
+        return redirect(url_for('hr.view_application', application_id=current_user.application.id))
 
     # Get all corporations that are open for recruitment.
     openCorporations = [corp for corp in Alliance.query.filter_by(id=current_app.config["ALLIANCE_ID"]).first().corporations if corp.recruitment_open]
@@ -127,10 +130,12 @@ def application_help(corporation_id):
                            redirect_url=url_for('hr.apply', corporation_id=corporation_id))
 
 
-@Application.route('/view_application', methods=['GET', 'POST'])
+@Application.route('/view_corp_applications')
 @login_required
-def view_application():
-    """Views the application of the current user.
+@alliance_required()
+@needs_permission('read_applications', 'View Corporation Applications')
+def view_corp_applications():
+    """Views all the applications to the current corp.
 
     Args:
         None
@@ -139,16 +144,117 @@ def view_application():
         str: redirect to the appropriate url.
     """
 
-    # Check if character has an application
-    if current_user.application is None:
-        flash("You have no pending application.", 'danger')
-        current_app.logger.info("{} tried to access application when they didn't have an application.".format(current_user.name))
+    return render_template('hr/view_corp_applications.html', corporation=current_user.get_corp())
+
+
+@Application.route('/view_corp_members')
+@login_required
+@alliance_required()
+@needs_permission('read_membership', 'View Corporation Members')
+def view_corp_members():
+    """Views all the members from the current corp.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    return render_template('hr/view_corp_members.html', corporation=current_user.get_corp())
+
+
+@Application.route('/view_application/<int:application_id>', methods=['GET', 'POST'])
+@login_required
+def view_application(application_id):
+    """Views an application with ID.
+
+    Args:
+        application_id (int): ID of the application.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    # Get user application.
+    application = ApplicationModel.query.filter_by(id=application_id).first()
+    isPersonalApplication = False
+
+    # Redirect if application does not exist.
+    if not application:
+        flash("Application with ID {} is not present in the database.".format(str(application_id)), 'danger')
+        current_app.logger.info("{} tried to view application with ID {} which does not exist in the database".format(current_user.name, str(application_id)))
         return redirect(url_for('hr.index'))
 
-    if request.method == 'POST':
-        if request.form['btn'] == "RemoveApplication":
-            Database.session.delete(current_user.application)
-            Database.session.commit()
-            return redirect(url_for('hr.index'))
+    # check if application is a personal application.
+    if current_user.application and current_user.application.id == application_id:
+        isPersonalApplication = True
 
-    return render_template('hr/application.html', discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+    # Check if application corp is the user's corp.
+    if not isPersonalApplication and application.corporation.id is not current_user.get_corp().id:
+        flash('That application is not to your corp.', 'danger')
+        current_app.logger.info("{} tried to view application which is not to their corporation.".format(current_user.name))
+        return redirect(url_for('hr.index'))
+
+    # Check if user is viewing a personal application or someone else's application.
+    if not isPersonalApplication and not current_user.has_permission('read_applications'):
+        flash("You do not have the required permission to view other people's applications.", "danger")
+        current_app.logger.info("{} tried to illegally access someone else's application but didn't have the required read_applications permission.".format(current_user.name))
+        return redirect(url_for('hr.index'))
+
+    # Make application forms.
+    removeApplicationForm = RemoveApplicationForm()
+    editApplicationForm = EditApplicationForm(notes=application.character.notes)
+
+    # Removal of applications.
+    if request.method == 'POST':
+        # Check if notes were updated.
+        if 'btn' not in request.form:
+            if 'notes' in request.form and editApplicationForm.validate_on_submit():
+                oldNote = application.character.notes
+                application.character.notes = editApplicationForm.notes.data
+                Database.session.commit()
+                flash("Successfully updated note.", "success")
+                current_app.logger.info("{} updated {}'s note from '{}' to {}.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
+                return redirect(url_for('hr.view_application', application_id=application.id))
+
+        # Check other button presses.
+        if request.form['btn'] == "RemoveApplication":
+            # Check if application is valid.
+            if not removeApplicationForm.validate_on_submit():
+                flash('Please make sure you provide a reason when removing an application.', 'danger')
+                return redirect(url_for('hr.view_application', application_id=application.id))
+
+            characterName = application.character.name
+            corpName = application.corporation.name
+            rejectionReason = removeApplicationForm.rejection_reason.data
+
+            # Add note with rejection reason.
+            application.character.notes += "Application removed ({}) by {}: {}\n".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
+
+            Database.session.delete(application)
+            Database.session.commit()
+
+            flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
+            current_app.logger.info("{} removed application of {} to {} with reason '{}'.".format(current_user.name, characterName, corpName, rejectionReason))
+        elif request.form['btn'] == "RemovePersonalApplication":
+            characterName = application.character.name
+            corpName = application.corporation.name
+
+            Database.session.delete(application)
+            Database.session.commit()
+
+            flash("Successfully removed application of {} to {}.".format(characterName, corpName), 'success')
+            current_app.logger.info("{} removed application of {} to {}.".format(current_user.name, characterName, corpName))
+        elif request.form['btn'] == "UpdateApplication":
+            application.ready_accepted = not application.ready_accepted
+            newStatus = "Ready to be accepted" if application.ready_accepted else "Being processed"
+            Database.session.commit()
+            flash("Successfully set {} application status to {}.".format(application.character.name, newStatus), 'success')
+            current_app.logger.info("{} edited status of {} application to {}".format(current_user.name, application.character.name, newStatus))
+            return redirect(url_for('hr.view_application', application_id=application.id))
+
+        return redirect(url_for('hr.index'))
+
+    return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication,
+                           remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])

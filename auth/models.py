@@ -1,4 +1,5 @@
 from .shared import Database, SharedInfo
+from datetime import datetime
 
 # -- Connections -- #
 permissionConnection = Database.Table(
@@ -26,6 +27,7 @@ class Character(Database.Model):
     refresh_token = Database.Column(Database.String)
     reddit = Database.Column(Database.String)
     portrait = Database.Column(Database.String)
+    notes = Database.Column(Database.String)
     application = Database.relationship('Application', uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, id, name, main_id, portrait):
@@ -33,6 +35,7 @@ class Character(Database.Model):
         self.name = name
         self.main_id = main_id
         self.portrait = portrait
+        self.notes = ""
 
     @property
     def is_authenticated(self):
@@ -63,7 +66,7 @@ class Character(Database.Model):
         return [alt for alt in Character.query.filter_by(main_id=self.id) if alt.main_id != alt.id]
 
     def get_main(self):
-        return Character.filter_by(id=self.main_id).first()
+        return Character.query.filter_by(id=self.main_id).first()
 
     def has_permission(self, permission_name):
         # Loop over roles to see if any of the roles have the correct permission
@@ -73,6 +76,20 @@ class Character(Database.Model):
 
         # If nothing was found, return false
         return False
+
+    def get_errors(self):
+        errors = []
+
+        if self.access_token is None or self.refresh_token is None:
+            errors.append("No valid ESI authorization provided.")
+
+        if self.reddit is None:
+            errors.append("No reddit account provided.")
+
+        if not self.get_main().is_in_alliance:
+            errors.append("Main {} is not a member of this alliance.".format(self.get_main().name))
+
+        return errors
 
     @property
     def is_in_alliance(self):
@@ -169,6 +186,7 @@ class Role(Database.Model):
 class Application(Database.Model):
     __tablename__ = 'Applications'
     id = Database.Column(Database.Integer, primary_key=True)
+    timestamp = Database.Column(Database.DateTime)
     character_id = Database.Column(Database.Integer, Database.ForeignKey(Character.id))
     character = Database.relationship("Character", backref="Applications")
     corporation_id = Database.Column(Database.Integer, Database.ForeignKey(Corporation.id), nullable=False)
@@ -176,6 +194,7 @@ class Application(Database.Model):
     ready_accepted = Database.Column(Database.Boolean)
 
     def __init__(self, corporation):
+        self.timestamp = datetime.utcnow()
         self.corporation = corporation
         self.ready_accepted = False
 

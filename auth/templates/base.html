@@ -31,6 +31,8 @@
 
     <!-- Links -->
     <ul class="navbar-nav">
+    {% block navbar %}
+    {% endblock %}
       <!-- Dropdown -->
       {% if not current_user.is_anonymous %}
         <li class="nav-item dropdown">
@@ -44,9 +46,7 @@
             {% if current_user.has_permission("corp_manager") %}
             <a class="dropdown-item" href="{{ url_for('corp_management.index') }}"><img src="/static/open-iconic/svg/person.svg"> Corp Management</a>
             {% endif %}
-            {% if current_user.has_permission("read_membership") %}
             <a class="dropdown-item" href="{{ url_for('hr.index') }}">Human Resources</a>
-            {% endif %}
             <div class="dropdown-divider"></div>
             <h6 class="dropdown-header">GETIN - External</a>
             <a class="dropdown-item" href="https://fits.wormbro.academy/" target="_blank"> Fits</a>
@@ -90,6 +90,7 @@
       {% endif %}
     {% endwith %}
     {% block content %}{% endblock content %}
+    {% block modals %}{% endblock modals %}
   </div>
 </body>
 </html>

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script>
+function process(e, formID) {
+    if(e.which == 13 && !e.shiftKey) {        
+        $(formID).submit();
+        e.preventDefault();
+        return false;
+    }
+}
+</script>
+{% endblock head %}
+
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+	<div class="card bg-light" style="max-width: 40rem;">
+		<div class="card-header"><h3><img class="rounded-circle" src="{{ application.character.portrait }}" alt="{{ application.character.name }} portrait" width=50 height=50> {{ application.character.name }} Application</h3></div>
+		<div class="card-body">
+			<table class="table borderless">
+				<tr>
+					<th width="30%" scope="row">Character Name</th>
+					<td width="70%">{{ application.character.name }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Current Corp</th>
+					<td>{{ application.corporation.name }}</td>
+				</tr>
+				<tr>
+					<th scope="row">Reddit</th>
+					<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
+				</tr>
+				<tr>
+					<th scope="row">Creation Date</th>
+					<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
+				</tr>
+				<tr>
+					<th scope="row">Status</th>
+					<td>
+						{% if application.ready_accepted %}
+							Ready to be accepted
+						{% else %}
+							Being processed
+						{% endif %}
+					</td>
+				</tr>
+				{% if personal_application %}
+					<tr>
+						<th scope="row">Account</th>
+						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Account information</a></td>
+					</tr>
+				{% else %}
+				<tr>
+					<th scope="row">Killboard</th>
+					<td><a target="_blank" href="https://zkillboard.com/character/{{ application.character.id }}/" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Zkillboard</a></td>
+				</tr>
+				<tr>
+					<th scope="row">ESI</th>
+					<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+				</tr>
+				<tr>
+					<th scope="row">Notes</th>
+					<td>
+					<form id="NoteForm" method="POST">
+						{{ edit_form.csrf_token }}
+						{{ edit_form.notes(rows='5', class="form-control", onkeypress="process(event,NoteForm,this)") }}
+					</form>
+					</td>
+				</tr>
+				{% endif %}
+			</table>
+			<div class="text-center"><i>Application to {{ application.corporation.name }}</i></div>
+		</div>
+		<div class="card-footer text-center">
+			<form method="POST">
+				{% if personal_application %}
+						<button type="submit" value="RemovePersonalApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
+				{% else %}
+					<button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removeApplicationModal">Remove application</button>
+					{% if application.ready_accepted %}
+						<button type="submit" value="UpdateApplication" name="btn" class="btn btn-outline-warning" aria-pressed="true">Set to 'Being processed'</button>
+					{% else %}
+						<button type="submit" value="UpdateApplication" name="btn" class="btn btn-outline-success" aria-pressed="true">Set to 'Ready to be accepted'</button>
+					{% endif %}
+				{% endif %}
+			</form>
+		</div>
+	</div>
+	{% if personal_application %}
+		<br><br>
+		<p>Please join our recruitment Discord server to set a time for your interview. Once in the server, type '@Recruiters' to notify the recruiters that you are available for an interview. An interviewer will help you out if one is available. If no one responds, try again in a couple of hours. Please make sure you set a push-to-talk button, and that you said your nickname to your character's name. You can set your nickname by typing '/nick', followed by the character name.</p>
+		<a class="btn btn btn-dark" target="_blank" href="{{ discord_url }}" role="button" aria-pressed="true">Join Discord</a>
+	{% endif %}
+{% endblock content %}
+
+{% block modals %}
+	<div class="modal fade" id="removeApplicationModal" tabindex="-1" role="dialog" aria-labelledby="applicationRemovalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="applicationRemovalLongTitle">Removal reason</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <form method="POST">
+		      <div class="modal-body">
+		      	{{ remove_form.csrf_token }}
+				{{ remove_form.rejection_reason(class="form-control") }}
+		      </div>
+		      <div class="modal-footer">
+					<button type="submit" value="RemoveApplication" name="btn" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove application</button>
+		      </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+{% endblock modals %}
