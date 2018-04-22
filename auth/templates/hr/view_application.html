@@ -39,6 +39,10 @@ function process(e, formID) {
 					<td>{{ application.corporation.name }}</td>
 				</tr>
 				<tr>
+					<th scope="row">Reddit</th>
+					<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
+				</tr>
+				<tr>
 					<th scope="row">Creation Date</th>
 					<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
 				</tr>
@@ -59,11 +63,19 @@ function process(e, formID) {
 					</tr>
 				{% else %}
 				<tr>
+					<th scope="row">Killboard</th>
+					<td><a target="_blank" href="https://zkillboard.com/character/{{ application.character.id }}/" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Zkillboard</a></td>
+				</tr>
+				<tr>
+					<th scope="row">ESI</th>
+					<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+				</tr>
+				<tr>
 					<th scope="row">Notes</th>
 					<td>
 					<form id="NoteForm" method="POST">
 						{{ edit_form.csrf_token }}
-						{{ edit_form.notes(class="form-control", onkeypress="process(event,NoteForm,this)") }}
+						{{ edit_form.notes(rows='5', class="form-control", onkeypress="process(event,NoteForm,this)") }}
 					</form>
 					</td>
 				</tr>
