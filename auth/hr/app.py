@@ -178,6 +178,14 @@ def view_application(application_id):
 
     # Get user application.
     application = ApplicationModel.query.filter_by(id=application_id).first()
+
+    # Check if application corp is the user's corp.
+    if application.corporation.id is not current_user.get_corp().id:
+        flash('That application is not to your corp.', 'danger')
+        current_app.logger.info("{} tried to view application which is not to their corporation.".format(current_user.name))
+        return redirect(url_for('hr.index'))
+
+    # Make application form
     removeApplicationForm = RemoveApplicationForm()
     isPersonalApplication = False
 
