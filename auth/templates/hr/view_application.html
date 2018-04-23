@@ -40,7 +40,7 @@ function process(e, formID) {
 				</tr>
 				<tr>
 					<th scope="row">Reddit</th>
-					{% if character.reddit %}
+					{% if application.character.reddit %}
 						<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
 					{% else %}
 						<td><strong>None</strong></td>
