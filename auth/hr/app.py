@@ -204,7 +204,7 @@ def view_application(application_id):
 
     # Make application forms.
     removeApplicationForm = RemoveApplicationForm()
-    editApplicationForm = EditApplicationForm(notes=application.character.notes)
+    editApplicationForm = EditNoteForm(notes=application.character.notes)
 
     # Removal of applications.
     if request.method == 'POST':
@@ -215,7 +215,7 @@ def view_application(application_id):
                 application.character.notes = editApplicationForm.notes.data
                 Database.session.commit()
                 flash("Successfully updated note.", "success")
-                current_app.logger.info("{} updated {}'s note from '{}' to {}.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
+                current_app.logger.info("{} updated {}'s note from '{}' to '{}'.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
                 return redirect(url_for('hr.view_application', application_id=application.id))
 
         # Check other button presses.
@@ -230,7 +230,10 @@ def view_application(application_id):
             rejectionReason = removeApplicationForm.rejection_reason.data
 
             # Add note with rejection reason.
-            application.character.notes += "Application removed ({}) by {}: {}\n".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
+            # If there are already notes, add an enter.
+            if application.character.notes:
+                application.character.notes += "\n"
+            application.character.notes += "Application removed ({}) by {}: {}".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
 
             Database.session.delete(application)
             Database.session.commit()
@@ -273,6 +276,8 @@ def view_member(member_id):
     Returns:
         str: redirect to the appropriate url.
     """
+
+    # Get character and roles.
     character = Character.query.filter_by(id=member_id).first()
     roles = Role.query.all()
 

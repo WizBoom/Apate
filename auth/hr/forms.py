@@ -8,5 +8,5 @@ class RemoveApplicationForm(FlaskForm):
     rejection_reason = StringField('Rejection Reason', widget=TextArea(), validators=[InputRequired()])
 
 
-class EditApplicationForm(FlaskForm):
+class EditNoteForm(FlaskForm):
     notes = StringField('Notes', widget=TextArea())
