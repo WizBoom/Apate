@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, current_app, flash, url_for, redirect, request
 from flask_login import login_required, current_user
-from auth.models import Application as ApplicationModel, Corporation, Alliance
+from auth.models import Application as ApplicationModel, Corporation, Alliance, Character, Role
 from auth.shared import Database, EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
 from auth.hr.forms import *
@@ -258,3 +258,50 @@ def view_application(application_id):
 
     return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication,
                            remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+
+
+@Application.route('/view_member/<int:member_id>', methods=['GET', 'POST'])
+@login_required
+@alliance_required()
+@needs_permission('read_membership', 'View Member')
+def view_member(member_id):
+    """Views a member with ID.
+
+    Args:
+        member_id (int): ID of the member.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+    character = Character.query.filter_by(id=member_id).first()
+    roles = Role.query.all()
+
+    # Check if character exists.
+    if not character:
+        flash("Character with ID {} is not present in the database.".format(str(member_id)), 'danger')
+        current_app.logger.info("{} tried to view member with ID {} which does not exist in the database".format(current_user.name, str(member_id)))
+        return redirect(url_for('hr.index'))
+
+    if request.method == 'POST':
+        # Check the formtype
+        if request.form['FormType'] == "RoleToggle" and current_user.has_permission('edit_member_roles'):
+            role = Role.query.filter_by(id=request.form['RoleId']).first()
+            # If the user had the role, remove it.
+            if role in character.roles:
+                character.roles.remove(role)
+                Database.session.commit()
+                flash('Succesfully removed {} role from {}.'.format(role.name, character.name), 'success')
+                current_app.logger.info('{} removed {} role from {}.'.format(current_user.name, role.name, character.name))
+                return redirect(url_for('hr.view_member', member_id=character.id))
+            # If the user didn't have the role, add it.
+            else:
+                character.roles.append(role)
+                Database.session.commit()
+                flash('Succesfully added {} role to {}.'.format(role.name, character.name), 'success')
+                current_app.logger.info('{} added {} role to {}.'.format(current_user.name, role.name, character.name))
+                return redirect(url_for('hr.view_member', member_id=character.id))
+
+            # Default redirect.
+            return redirect(url_for('hr.view_member', member_id=character.id))
+
+    return render_template('hr/view_member.html', character=character, roles=roles)

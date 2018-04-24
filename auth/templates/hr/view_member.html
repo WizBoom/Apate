@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card-deck">
+		<div class="card mb-4" style="max-width: 40em">
+			<div class="card-header"><h3><img class="rounded-circle" src="{{ character.portrait }}" alt="{{ character.name }} portrait" width=50 height=50> {{ character.name }}</h3></div>
+			<div class="card-body">
+				<table class="table borderless">
+					<tr>
+						<th width="30%" scope="row">Character Name</th>
+						<td width="70%">{{ character.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Current Corp</th>
+						<td>{{ character.corporation.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Reddit</th>
+						{% if character.reddit %}
+							<td><a href="https://www.reddit.com/u/{{character.reddit}}" target="_blank">{{character.reddit}}</a></td>
+						{% else %}
+							<td><strong>None</strong></td>
+						{% endif %}
+					</tr>
+					<tr>
+						<th scope="row">ESI</th>
+						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+					</tr>
+					<tr>
+						<th scope="row">Roles</th>
+						<td>
+							{% for role in roles %}
+								<form method="POST">
+									<div class="form-check">
+										<input name="FormType" type="hidden" value="RoleToggle">
+										<input name="RoleId" type="hidden" value="{{ role.id }}">
+									  	<input class="form-check-input" type="checkbox" onclick="this.form.submit()" id="{{ role.id }}" {% if role in character.roles %}checked{% endif %} {% if not current_user.has_permission('edit_member_roles') %}disabled{% endif %}>
+									  	<label class="form-check-label" for="{{role.id}}">{{ role.name }}</label>
+									</div>
+								</form>
+							{% endfor %}
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="card-footer text-center"><a href="#" class="btn btn-outline-dark" role="button">Apply</a></div>
+		</div>
+    </div>
+</div>
+{% endblock content %}
