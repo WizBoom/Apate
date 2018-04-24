@@ -5,6 +5,7 @@ from auth.shared import Database, EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
 from auth.hr.forms import *
 from datetime import datetime
+from sqlalchemy import func
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -281,6 +282,7 @@ def view_member(member_id):
     character = Character.query.filter_by(id=member_id).first()
     roles = Role.query.all()
     alts = [alt.name for alt in character.get_alts()]
+    mains = [main for main in Character.query.order_by(func.lower(Character.name)).all() if main.is_in_alliance]
 
     # Make note forms.
     editNoteForm = EditNoteForm(notes=character.notes)
@@ -315,5 +317,20 @@ def view_member(member_id):
                 Database.session.commit()
                 flash('Succesfully added {} role to {}.'.format(role.name, character.name), 'success')
                 current_app.logger.info('{} added {} role to {}.'.format(current_user.name, role.name, character.name))
+        # Check if main selection has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "MainSelection" and current_user.has_permission('edit_member'):
+            # Double check if main exist
+            main = Character.query.filter_by(id=request.form['MainID']).first()
+            if not main:
+                flash('That main does not exist in the database.', 'danger')
+                current_app.logger.warning("{} tried to edit {}'s main, but main with ID {} does not exist.".format(current_user.name, character.name, request.form['MainID']))
+                return redirect(url_for('hr.view_member', member_id=character.id))
+
+            oldMain = character.get_main().name
+            character.main_id = request.form['MainID']
+            Database.session.commit()
+            flash('Successfully updated main from {} to {}.'.format(oldMain, character.name), 'success')
+            current_app.logger.info("{} updated {}'s main from {} to {}".format(current_user.name, character.name, oldMain, character.get_main().name))
+
         return redirect(url_for('hr.view_member', member_id=character.id))
-    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts)
+    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts, mains=mains)

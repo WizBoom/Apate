@@ -50,7 +50,20 @@ function process(e, formID) {
 					</tr>
 					<tr>
 						<th scope="row">Main</th>
-						<td>{{ character.get_main().name }}</td>
+						<td>
+							{% if current_user.has_permission('edit_member') %}
+								<form method="POST">
+									<input name="FormType" type="hidden" value="MainSelection">
+									<select name="MainID" onchange="this.form.submit()" class="form-control">
+									{% for main in mains %}
+										<option value="{{ main.id }}" {% if character.main_id ==  main.id %}selected{% endif %}>{{ main.name }}</option>
+									{% endfor %}
+									</select>
+								</form>
+							{% else %}
+								{{ character.get_main().name }}
+							{% endif %}
+						</td>
 					</tr>
 					<tr>
 						<th scope="row">Alts</th>
