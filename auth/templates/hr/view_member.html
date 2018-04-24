@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<script>
+function process(e, formID) {
+    if(e.which == 13 && !e.shiftKey) {        
+        $(formID).submit();
+        e.preventDefault();
+        return false;
+    }
+}
+</script>
 {% endblock head %}
 
 {% block navbar %}
@@ -28,8 +37,28 @@
 						<td width="70%">{{ character.name }}</td>
 					</tr>
 					<tr>
-						<th scope="row">Current Corp</th>
+						<th scope="row">Corporation</th>
 						<td>{{ character.corporation.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Alliance</th>
+						{% if character.corporation.get_alliance() %}
+							<td>{{ character.corporation.get_alliance().name }}</td>
+						{% else %}
+							<td>/</td>
+						{% endif %}
+					</tr>
+					<tr>
+						<th scope="row">Main</th>
+						<td>{{ character.get_main().name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Alts</th>
+						{% if character.get_alts() %}
+							<td>{{ alts|sort()|join(', ') }}</td>
+						{% else %}
+							<td>/</td>
+						{% endif %}
 					</tr>
 					<tr>
 						<th scope="row">Reddit</th>
@@ -44,6 +73,10 @@
 						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
 					</tr>
 					<tr>
+						<th scope="row">Killboard</th>
+						<td><a target="_blank" href="https://zkillboard.com/character/{{ character.id }}/" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Zkillboard</a></td>
+					</tr>
+					<tr>
 						<th scope="row">Roles</th>
 						<td>
 							{% for role in roles %}
@@ -56,6 +89,15 @@
 									</div>
 								</form>
 							{% endfor %}
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Notes</th>
+						<td>
+							<form id="NoteForm" method="POST">
+								{{ note_form.csrf_token }}
+								{{ note_form.notes(disabled=not current_user.has_permission('edit_member'), rows='5', class="form-control", onkeypress="process(event,NoteForm,this)") }}
+							</form>
 						</td>
 					</tr>
 				</table>

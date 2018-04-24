@@ -280,6 +280,10 @@ def view_member(member_id):
     # Get character and roles.
     character = Character.query.filter_by(id=member_id).first()
     roles = Role.query.all()
+    alts = [alt.name for alt in character.get_alts()]
+
+    # Make note forms.
+    editNoteForm = EditNoteForm(notes=character.notes)
 
     # Check if character exists.
     if not character:
@@ -288,8 +292,16 @@ def view_member(member_id):
         return redirect(url_for('hr.index'))
 
     if request.method == 'POST':
-        # Check the formtype
-        if request.form['FormType'] == "RoleToggle" and current_user.has_permission('edit_member_roles'):
+        # Check if notes have been updated.
+        if 'notes' in request.form and editNoteForm.validate_on_submit():
+            oldNote = character.notes
+            character.notes = editNoteForm.notes.data
+            Database.session.commit()
+            flash("Successfully updated note.", "success")
+            current_app.logger.info("{} updated {}'s note from '{}' to '{}'.".format(current_user.name, character.name, oldNote, editNoteForm.notes.data))
+        # Check the formtype.
+        # Check if role toggle has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "RoleToggle" and current_user.has_permission('edit_member_roles'):
             role = Role.query.filter_by(id=request.form['RoleId']).first()
             # If the user had the role, remove it.
             if role in character.roles:
@@ -297,16 +309,11 @@ def view_member(member_id):
                 Database.session.commit()
                 flash('Succesfully removed {} role from {}.'.format(role.name, character.name), 'success')
                 current_app.logger.info('{} removed {} role from {}.'.format(current_user.name, role.name, character.name))
-                return redirect(url_for('hr.view_member', member_id=character.id))
             # If the user didn't have the role, add it.
             else:
                 character.roles.append(role)
                 Database.session.commit()
                 flash('Succesfully added {} role to {}.'.format(role.name, character.name), 'success')
                 current_app.logger.info('{} added {} role to {}.'.format(current_user.name, role.name, character.name))
-                return redirect(url_for('hr.view_member', member_id=character.id))
-
-            # Default redirect.
-            return redirect(url_for('hr.view_member', member_id=character.id))
-
-    return render_template('hr/view_member.html', character=character, roles=roles)
+        return redirect(url_for('hr.view_member', member_id=character.id))
+    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts)
