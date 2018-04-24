@@ -303,7 +303,7 @@ def view_member(member_id):
             current_app.logger.info("{} updated {}'s note from '{}' to '{}'.".format(current_user.name, character.name, oldNote, editNoteForm.notes.data))
         # Check the formtype.
         # Check if role toggle has been triggered.
-        elif 'FormType' in request.form and request.form['FormType'] == "RoleToggle" and current_user.has_permission('edit_member_roles'):
+        elif 'FormType' in request.form and request.form['FormType'] == "RoleToggle" and current_user.has_permission('corp_manager'):
             role = Role.query.filter_by(id=request.form['RoleId']).first()
             # If the user had the role, remove it.
             if role in character.roles:
