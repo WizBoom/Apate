@@ -115,7 +115,13 @@ function process(e, formID) {
 					</tr>
 				</table>
 			</div>
-			<div class="card-footer text-center"><a href="#" class="btn btn-outline-danger" role="button">Delete User</a></div>
+			{% if current_user.has_permission('corp_manager') %}
+			      <form method="POST">
+				      <div class="card-footer text-center">
+							<button type="submit" value="RemoveApplication" name="FormType" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove User</button>
+				      </div>
+			      </form>
+			{% endif %}
 		</div>
     </div>
 </div>

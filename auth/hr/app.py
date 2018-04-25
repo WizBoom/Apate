@@ -281,17 +281,18 @@ def view_member(member_id):
     # Get character and roles.
     character = Character.query.filter_by(id=member_id).first()
     roles = Role.query.all()
-    alts = [alt.name for alt in character.get_alts()]
     mains = [main for main in Character.query.order_by(func.lower(Character.name)).all() if main.is_in_alliance]
-
-    # Make note forms.
-    editNoteForm = EditNoteForm(notes=character.notes)
 
     # Check if character exists.
     if not character:
         flash("Character with ID {} is not present in the database.".format(str(member_id)), 'danger')
         current_app.logger.info("{} tried to view member with ID {} which does not exist in the database".format(current_user.name, str(member_id)))
         return redirect(url_for('hr.index'))
+
+    alts = [alt.name for alt in character.get_alts()]
+
+    # Make note forms.
+    editNoteForm = EditNoteForm(notes=character.notes)
 
     if request.method == 'POST':
         # Check if notes have been updated.
@@ -331,6 +332,13 @@ def view_member(member_id):
             Database.session.commit()
             flash('Successfully updated main from {} to {}.'.format(oldMain, character.name), 'success')
             current_app.logger.info("{} updated {}'s main from {} to {}".format(current_user.name, character.name, oldMain, character.get_main().name))
+        # Check if deletion has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "RemoveApplication" and current_user.has_permission('corp_manager'):
+            Database.session.delete(character)
+            Database.session.commit()
+            flash('Sucessfully removed {}.'.format(character.name), 'success')
+            current_app.logger.info("{} removed {} from the database.".format(current_user.name, character.name))
+            return redirect(url_for('hr.index'))
 
         return redirect(url_for('hr.view_member', member_id=character.id))
     return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts, mains=mains)
