@@ -21,6 +21,7 @@ class Character(Database.Model):
     id = Database.Column(Database.Integer, primary_key=True)
     name = Database.Column(Database.String)
     main_id = Database.Column(Database.Integer)
+    corporation = Database.relationship('Corporation', backref='Characters')
     corp_id = Database.Column(Database.Integer, Database.ForeignKey('Corporations.id'))
     admin_corp_id = Database.Column(Database.Integer)
     access_token = Database.Column(Database.String)

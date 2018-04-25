@@ -19,15 +19,17 @@ Admin.roles.append(AdminRole)
 # Make permissions
 AdminPermission = Permission('admin')
 CorpManagerPermission = Permission('corp_manager')
-ReadMembership = Permission('read_membership')
-ReadApplications = Permission('read_applications')
-ReviewApplications = Permission('review_applications')
+ReadMembershipPermission = Permission('read_membership')
+EditMemberPermission = Permission('edit_member')
+ReadApplicationsPermission = Permission('read_applications')
+ReviewApplicationsPermission = Permission('review_applications')
 
 # Link permissions
 AdminRole.permissions.append(AdminPermission)
 AdminRole.permissions.append(CorpManagerPermission)
-AdminRole.permissions.append(ReadMembership)
-AdminRole.permissions.append(ReadApplications)
-AdminRole.permissions.append(ReviewApplications)
+AdminRole.permissions.append(ReadMembershipPermission)
+AdminRole.permissions.append(EditMemberPermission)
+AdminRole.permissions.append(ReadApplicationsPermission)
+AdminRole.permissions.append(ReviewApplicationsPermission)
 
 Database.session.commit()

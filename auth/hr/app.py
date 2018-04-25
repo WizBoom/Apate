@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, current_app, flash, url_for, redirect, request
 from flask_login import login_required, current_user
-from auth.models import Application as ApplicationModel, Corporation, Alliance
+from auth.models import Application as ApplicationModel, Corporation, Alliance, Character, Role
 from auth.shared import Database, EveAPI, SharedInfo
 from auth.decorators import needs_permission, alliance_required
 from auth.hr.forms import *
 from datetime import datetime
+from sqlalchemy import func
 
 # Create and configure app
 Application = Blueprint('hr', __name__, template_folder='templates/hr', static_folder='static')
@@ -204,7 +205,7 @@ def view_application(application_id):
 
     # Make application forms.
     removeApplicationForm = RemoveApplicationForm()
-    editApplicationForm = EditApplicationForm(notes=application.character.notes)
+    editApplicationForm = EditNoteForm(notes=application.character.notes)
 
     # Removal of applications.
     if request.method == 'POST':
@@ -215,7 +216,7 @@ def view_application(application_id):
                 application.character.notes = editApplicationForm.notes.data
                 Database.session.commit()
                 flash("Successfully updated note.", "success")
-                current_app.logger.info("{} updated {}'s note from '{}' to {}.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
+                current_app.logger.info("{} updated {}'s note from '{}' to '{}'.".format(current_user.name, application.character.name, oldNote, editApplicationForm.notes.data))
                 return redirect(url_for('hr.view_application', application_id=application.id))
 
         # Check other button presses.
@@ -230,7 +231,10 @@ def view_application(application_id):
             rejectionReason = removeApplicationForm.rejection_reason.data
 
             # Add note with rejection reason.
-            application.character.notes += "Application removed ({}) by {}: {}\n".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
+            # If there are already notes, add an enter.
+            if application.character.notes:
+                application.character.notes += "\n"
+            application.character.notes += "Application removed ({}) by {}: {}".format(datetime.utcnow().strftime('%Y/%m/%d'), current_user.name, rejectionReason)
 
             Database.session.delete(application)
             Database.session.commit()
@@ -258,3 +262,83 @@ def view_application(application_id):
 
     return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication,
                            remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+
+
+@Application.route('/view_member/<int:member_id>', methods=['GET', 'POST'])
+@login_required
+@alliance_required()
+@needs_permission('read_membership', 'View Member')
+def view_member(member_id):
+    """Views a member with ID.
+
+    Args:
+        member_id (int): ID of the member.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    # Get character and roles.
+    character = Character.query.filter_by(id=member_id).first()
+    roles = Role.query.all()
+    mains = [main for main in Character.query.order_by(func.lower(Character.name)).all() if main.is_in_alliance]
+
+    # Check if character exists.
+    if not character:
+        flash("Character with ID {} is not present in the database.".format(str(member_id)), 'danger')
+        current_app.logger.info("{} tried to view member with ID {} which does not exist in the database".format(current_user.name, str(member_id)))
+        return redirect(url_for('hr.index'))
+
+    alts = [alt.name for alt in character.get_alts()]
+
+    # Make note forms.
+    editNoteForm = EditNoteForm(notes=character.notes)
+
+    if request.method == 'POST':
+        # Check if notes have been updated.
+        if 'notes' in request.form and editNoteForm.validate_on_submit():
+            oldNote = character.notes
+            character.notes = editNoteForm.notes.data
+            Database.session.commit()
+            flash("Successfully updated note.", "success")
+            current_app.logger.info("{} updated {}'s note from '{}' to '{}'.".format(current_user.name, character.name, oldNote, editNoteForm.notes.data))
+        # Check the formtype.
+        # Check if role toggle has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "RoleToggle" and current_user.has_permission('corp_manager'):
+            role = Role.query.filter_by(id=request.form['RoleId']).first()
+            # If the user had the role, remove it.
+            if role in character.roles:
+                character.roles.remove(role)
+                Database.session.commit()
+                flash('Succesfully removed {} role from {}.'.format(role.name, character.name), 'success')
+                current_app.logger.info('{} removed {} role from {}.'.format(current_user.name, role.name, character.name))
+            # If the user didn't have the role, add it.
+            else:
+                character.roles.append(role)
+                Database.session.commit()
+                flash('Succesfully added {} role to {}.'.format(role.name, character.name), 'success')
+                current_app.logger.info('{} added {} role to {}.'.format(current_user.name, role.name, character.name))
+        # Check if main selection has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "MainSelection" and current_user.has_permission('edit_member'):
+            # Double check if main exist
+            main = Character.query.filter_by(id=request.form['MainID']).first()
+            if not main:
+                flash('That main does not exist in the database.', 'danger')
+                current_app.logger.warning("{} tried to edit {}'s main, but main with ID {} does not exist.".format(current_user.name, character.name, request.form['MainID']))
+                return redirect(url_for('hr.view_member', member_id=character.id))
+
+            oldMain = character.get_main().name
+            character.main_id = request.form['MainID']
+            Database.session.commit()
+            flash('Successfully updated main from {} to {}.'.format(oldMain, character.name), 'success')
+            current_app.logger.info("{} updated {}'s main from {} to {}".format(current_user.name, character.name, oldMain, character.get_main().name))
+        # Check if deletion has been triggered.
+        elif 'FormType' in request.form and request.form['FormType'] == "RemoveApplication" and current_user.has_permission('corp_manager'):
+            Database.session.delete(character)
+            Database.session.commit()
+            flash('Sucessfully removed {}.'.format(character.name), 'success')
+            current_app.logger.info("{} removed {} from the database.".format(current_user.name, character.name))
+            return redirect(url_for('hr.index'))
+
+        return redirect(url_for('hr.view_member', member_id=character.id))
+    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts, mains=mains)

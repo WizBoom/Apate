@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script>
+function process(e, formID) {
+    if(e.which == 13 && !e.shiftKey) {        
+        $(formID).submit();
+        e.preventDefault();
+        return false;
+    }
+}
+</script>
+{% endblock head %}
+
+{% block navbar %}
+	{% if current_user.has_permission("read_membership") %}
+		<li class="nav-item">
+		 	<a class="nav-link" href="{{ url_for('hr.view_corp_members') }}">Members</a>
+		</li>
+	{% endif %}
+	{% if current_user.has_permission("read_applications") %}
+		<li class="nav-item">
+		  	<a class="nav-link" href="{{ url_for('hr.view_corp_applications') }}">Applications</a>
+		</li>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card-deck">
+		<div class="card mb-4" style="max-width: 40em">
+			<div class="card-header"><h3><img class="rounded-circle" src="{{ character.portrait }}" alt="{{ character.name }} portrait" width=50 height=50> {{ character.name }}</h3></div>
+			<div class="card-body">
+				<table class="table borderless">
+					<tr>
+						<th width="30%" scope="row">Character Name</th>
+						<td width="70%">{{ character.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Corporation</th>
+						<td>{{ character.corporation.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Alliance</th>
+						{% if character.corporation.get_alliance() %}
+							<td>{{ character.corporation.get_alliance().name }}</td>
+						{% else %}
+							<td>/</td>
+						{% endif %}
+					</tr>
+					<tr>
+						<th scope="row">Main</th>
+						<td>
+							{% if current_user.has_permission('edit_member') %}
+								<form method="POST">
+									<input name="FormType" type="hidden" value="MainSelection">
+									<select name="MainID" onchange="this.form.submit()" class="form-control">
+									{% for main in mains %}
+										<option value="{{ main.id }}" {% if character.main_id ==  main.id %}selected{% endif %}>{{ main.name }}</option>
+									{% endfor %}
+									</select>
+								</form>
+							{% else %}
+								{{ character.get_main().name }}
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Alts</th>
+						{% if character.get_alts() %}
+							<td>{{ alts|sort()|join(', ') }}</td>
+						{% else %}
+							<td>/</td>
+						{% endif %}
+					</tr>
+					<tr>
+						<th scope="row">Reddit</th>
+						{% if character.reddit %}
+							<td><a href="https://www.reddit.com/u/{{character.reddit}}" target="_blank">{{character.reddit}}</a></td>
+						{% else %}
+							<td><strong>None</strong></td>
+						{% endif %}
+					</tr>
+					<tr>
+						<th scope="row">ESI</th>
+						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+					</tr>
+					<tr>
+						<th scope="row">Killboard</th>
+						<td><a target="_blank" href="https://zkillboard.com/character/{{ character.id }}/" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">Zkillboard</a></td>
+					</tr>
+					<tr>
+						<th scope="row">Roles</th>
+						<td>
+							{% for role in roles %}
+								<form method="POST">
+									<div class="form-check">
+										<input name="FormType" type="hidden" value="RoleToggle">
+										<input name="RoleId" type="hidden" value="{{ role.id }}">
+									  	<input class="form-check-input" type="checkbox" onclick="this.form.submit()" id="{{ role.id }}" {% if role in character.roles %}checked{% endif %} {% if not current_user.has_permission('corp_manager') %}disabled{% endif %}>
+									  	<label class="form-check-label" for="{{role.id}}">{{ role.name }}</label>
+									</div>
+								</form>
+							{% endfor %}
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">Notes</th>
+						<td>
+							<form id="NoteForm" method="POST">
+								{{ note_form.csrf_token }}
+								{{ note_form.notes(disabled=not current_user.has_permission('edit_member'), rows='5', class="form-control", onkeypress="process(event,NoteForm,this)") }}
+							</form>
+						</td>
+					</tr>
+				</table>
+			</div>
+			{% if current_user.has_permission('corp_manager') %}
+			      <form method="POST">
+				      <div class="card-footer text-center">
+							<button type="submit" value="RemoveApplication" name="FormType" class="btn btn-outline-danger btn-sm" aria-pressed="true">Remove User</button>
+				      </div>
+			      </form>
+			{% endif %}
+		</div>
+    </div>
+</div>
+{% endblock content %}

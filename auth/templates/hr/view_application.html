@@ -36,11 +36,15 @@ function process(e, formID) {
 				</tr>
 				<tr>
 					<th scope="row">Current Corp</th>
-					<td>{{ application.corporation.name }}</td>
+					<td>{{ application.character.corporation.name }}</td>
 				</tr>
 				<tr>
 					<th scope="row">Reddit</th>
-					<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
+					{% if application.character.reddit %}
+						<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
+					{% else %}
+						<td><strong>None</strong></td>
+					{% endif %}
 				</tr>
 				<tr>
 					<th scope="row">Creation Date</th>
