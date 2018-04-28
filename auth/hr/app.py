@@ -330,7 +330,7 @@ def view_member(member_id):
             oldMain = character.get_main().name
             character.main_id = request.form['MainID']
             Database.session.commit()
-            flash('Successfully updated main from {} to {}.'.format(oldMain, character.name), 'success')
+            flash('Successfully updated main from {} to {}.'.format(oldMain, character.get_main().name), 'success')
             current_app.logger.info("{} updated {}'s main from {} to {}".format(current_user.name, character.name, oldMain, character.get_main().name))
         # Check if deletion has been triggered.
         elif 'FormType' in request.form and request.form['FormType'] == "RemoveApplication" and current_user.has_permission('corp_manager'):
