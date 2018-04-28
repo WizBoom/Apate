@@ -8,6 +8,7 @@ from auth.shared import Database, SharedInfo, EveAPI
 from auth.admin.app import Application as admin_blueprint
 from auth.corp_management.app import Application as corp_management_blueprint
 from auth.hr import Application as hr_blueprint
+from auth.esi_parser import Application as esi_parser_blueprint
 from auth.models import *
 from auth.util import Util
 
@@ -86,6 +87,7 @@ FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 FlaskApplication.register_blueprint(corp_management_blueprint, url_prefix='/corp_management')
 FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
+FlaskApplication.register_blueprint(esi_parser_blueprint, url_prefix='/esi_parser')
 
 
 # Util
