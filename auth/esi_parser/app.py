@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
 from flask_login import current_user
 from auth.shared import EveAPI, SharedInfo
 from preston import Preston
@@ -7,7 +7,7 @@ from preston import Preston
 Application = Blueprint('esi_parser', __name__, template_folder='templates/esi', static_folder='static')
 
 
-@Application.route('/')
+@Application.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page of the ESI parser.
 
@@ -17,6 +17,10 @@ def index():
     Returns:
         str: redirect to the appropriate url.
     """
+    if request.method == 'POST':
+        return redirect(url_for('esi_parser.audit', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
+                        client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
+
     return render_template('esi_parser/index.html')
 
 
@@ -34,6 +38,7 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     Returns:
         str: redirect to the appropriate url.
     """
+
     # Get character.
     characterPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
     if characterPayload.status_code != 200:
