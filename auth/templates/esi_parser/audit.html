@@ -35,6 +35,84 @@
 				<strong>Born:</strong> {{ datetime_to_string(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}<br>
 				<strong>Age: </strong> {{ age_from_now(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}<br>
 			</div>
+		</div><br>
+		<nav class="navbar-dark">
+			<div class="nav nav-tabs" id="nav-tab" role="tablist">
+				<a class="nav-item nav-link active" id="nav-assets-tab" data-toggle="tab" href="#nav-assets" role="tab" aria-controls="nav-assets" aria-selected="false">Assets</a>
+				<a class="nav-item nav-link" id="nav-bookmarks-tab" data-toggle="tab" href="#nav-bookmarks" role="tab" aria-controls="nav-bookmarks" aria-selected="false">Bookmarks</a>
+				<a class="nav-item nav-link" id="nav-character-tab" data-toggle="tab" href="#nav-character" role="tab" aria-controls="nav-character" aria-selected="false">Character</a>
+				<a class="nav-item nav-link" id="nav-clones-tab" data-toggle="tab" href="#nav-clones" role="tab" aria-controls="nav-clones" aria-selected="false">Clones</a>
+				<a class="nav-item nav-link" id="nav-contacts-tab" data-toggle="tab" href="#nav-contacts" role="tab" aria-controls="nav-contacts" aria-selected="false">Contacts</a>
+				<a class="nav-item nav-link" id="nav-contracts-tab" data-toggle="tab" href="#nav-contracts" role="tab" aria-controls="nav-contracts" aria-selected="false">Contracts</a>
+				<a class="nav-item nav-link" id="nav-corporation-tab" data-toggle="tab" href="#nav-corporation" role="tab" aria-controls="nav-corporation" aria-selected="false">Corporation</a>
+				<a class="nav-item nav-link" id="nav-faction-warfare-tab" data-toggle="tab" href="#nav-faction-warfare" role="tab" aria-controls="nav-faction-warfare" aria-selected="false">Faction Warfare</a>
+				<a class="nav-item nav-link" id="nav-fittings-tab" data-toggle="tab" href="#nav-fittings" role="tab" aria-controls="nav-fittings" aria-selected="false">Fittings</a>
+				<a class="nav-item nav-link" id="nav-industry-tab" data-toggle="tab" href="#nav-industry" role="tab" aria-controls="nav-industry" aria-selected="false">Industry</a>
+				<a class="nav-item nav-link" id="nav-location-tab" data-toggle="tab" href="#nav-location" role="tab" aria-controls="nav-location" aria-selected="false">Location</a>
+				<a class="nav-item nav-link" id="nav-loyalty-tab" data-toggle="tab" href="#nav-loyalty" role="tab" aria-controls="nav-loyalty" aria-selected="false">LP</a>
+				<a class="nav-item nav-link" id="nav-mail-tab" data-toggle="tab" href="#nav-mail" role="tab" aria-controls="nav-mail" aria-selected="false">Mail</a>
+				<a class="nav-item nav-link" id="nav-market-tab" data-toggle="tab" href="#nav-market" role="tab" aria-controls="nav-market" aria-selected="false">Market</a>
+				<a class="nav-item nav-link" id="nav-opportunities-tab" data-toggle="tab" href="#nav-opportunities" role="tab" aria-controls="nav-opportunities" aria-selected="false">Opportunities</a>
+				<a class="nav-item nav-link" id="nav-planetary-interaction-tab" data-toggle="tab" href="#nav-planetary-interaction" role="tab" aria-controls="nav-planetary-interaction" aria-selected="false">PI</a>
+				<a class="nav-item nav-link" id="nav-skills-tab" data-toggle="tab" href="#nav-skills" role="tab" aria-controls="nav-skills" aria-selected="false">Skills</a>
+				<a class="nav-item nav-link" id="nav-wallet-tab" data-toggle="tab" href="#nav-wallet" role="tab" aria-controls="nav-wallet" aria-selected="false">Wallet</a>
+			</div>
+		</nav>
+		<div class="tab-content" id="nav-tabContent">
+			<div class="tab-pane fade show active" id="nav-assets" role="tabpanel" aria-labelledby="nav-assets-tab">
+			Assets tab
+			</div>
+			<div class="tab-pane fade" id="nav-bookmarks" role="tabpanel" aria-labelledby="av-bookmarks-tab">
+			Bookmarks tab
+			</div>
+			<div class="tab-pane fade" id="nav-character" role="tabpanel" aria-labelledby="nav-character-tab">
+			Character tab
+			</div>
+			<div class="tab-pane fade" id="nav-clones" role="tabpanel" aria-labelledby="nav-clones-tab">
+			Clones tab
+			</div>
+			<div class="tab-pane fade" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
+			Contacts tab
+			</div>
+			<div class="tab-pane fade" id="nav-contracts" role="tabpanel" aria-labelledby="nav-contracts-tab">
+			Contracts tab
+			</div>
+			<div class="tab-pane fade" id="nav-corporation" role="tabpanel" aria-labelledby="nav-corporation-tab">
+			Corporation tab
+			</div>
+			<div class="tab-pane fade" id="nav-faction-warfare" role="tabpanel" aria-labelledby="nav-faction-warfare-tab">
+			Faction warfare tab
+			</div>
+			<div class="tab-pane fade" id="nav-fittings" role="tabpanel" aria-labelledby="nav-fittings-tab">
+			Fittings tab
+			</div>
+			<div class="tab-pane fade" id="nav-industry" role="tabpanel" aria-labelledby="nav-industry-tab">
+			Industry tab
+			</div>
+			<div class="tab-pane fade" id="nav-location" role="tabpanel" aria-labelledby="nav-location-tab">
+			Location tab
+			</div>
+			<div class="tab-pane fade" id="nav-loyalty" role="tabpanel" aria-labelledby="nav-loyalty-tab">
+			Loyalty tab
+			</div>
+			<div class="tab-pane fade" id="nav-mail" role="tabpanel" aria-labelledby="nav-mail-tab">
+			Mail tab
+			</div>
+			<div class="tab-pane fade" id="nav-market" role="tabpanel" aria-labelledby="nav-market-tab">
+			Market tab
+			</div>
+			<div class="tab-pane fade" id="nav-opportunities" role="tabpanel" aria-labelledby="nav-opportunities-tab">
+			Opportunities tab
+			</div>
+			<div class="tab-pane fade" id="nav-planetary-interaction" role="tabpanel" aria-labelledby="nav-planetary-interaction-tab">
+			Planetary interaction tab
+			</div>
+			<div class="tab-pane fade" id="nav-skills" role="tabpanel" aria-labelledby="nav-skills-tab">
+			Skills tab
+			</div>
+			<div class="tab-pane fade" id="nav-wallet" role="tabpanel" aria-labelledby="nav-wallet-tab">
+			Wallet tab
+			</div>
 		</div>
 	</div>
 {% endblock content %}
