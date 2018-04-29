@@ -9,11 +9,29 @@ Application = Blueprint('esi_parser', __name__, template_folder='templates/esi',
 
 @Application.route('/')
 def index():
+    """Landing page of the ESI parser.
+
+    Args:
+        None
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
     return render_template('esi_parser/index.html')
 
 
 @Application.route('/audit/<int:character_id>/<refresh_token>/<scopes>')
 def audit(character_id, refresh_token, scopes):
+    """Views a member with ID.
+
+    Args:
+        character_id (int): ID of the character.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
     # Get character.
     characterPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
     if characterPayload.status_code != 200:
