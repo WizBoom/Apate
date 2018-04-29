@@ -22,7 +22,7 @@ class Util:
         esiRequest = requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
 
         if esiRequest.status_code != 200:
-                self.Application.logger.error('make_esi_request > ESI request threw error {}'.format(str(corporationPayload.status_code)))
+                self.Application.logger.error('make_esi_request > ESI request threw error {}'.format(str(esiRequest.status_code)))
 
         return esiRequest
 

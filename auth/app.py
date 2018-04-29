@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
-
 from auth.shared import Database, SharedInfo, EveAPI
 from auth.admin.app import Application as admin_blueprint
 from auth.corp_management.app import Application as corp_management_blueprint
@@ -11,6 +10,8 @@ from auth.hr import Application as hr_blueprint
 from auth.esi_parser import Application as esi_parser_blueprint
 from auth.models import *
 from auth.util import Util
+
+from datetime import date
 
 import praw
 from preston import Preston
@@ -82,6 +83,29 @@ SharedInfo['reddit'] = praw.Reddit(
 
 # Jinja global variables
 FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston"].get_authorize_url())
+
+
+# Jinja global functions
+def string_to_datetime(string, format):
+    return datetime.strptime(string, format)
+
+
+def datetime_to_string(datetime, format):
+    return datetime.strftime(format)
+
+
+def age_from_now(datetime):
+    days = (datetime.utcnow() - datetime).days
+    years = int(days / 365)
+    days -= years * 365
+    months = int(days / 30)
+    days -= months * 30
+    return "{} years, {} months and {} days".format(years, months, days)
+
+
+FlaskApplication.jinja_env.globals.update(string_to_datetime=string_to_datetime)
+FlaskApplication.jinja_env.globals.update(datetime_to_string=datetime_to_string)
+FlaskApplication.jinja_env.globals.update(age_from_now=age_from_now)
 
 # Blueprints
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
