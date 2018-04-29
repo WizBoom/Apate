@@ -263,3 +263,46 @@ class Util:
                 if pathSpec[key]['security'][0]['evesso'][0] not in preston.scope:
                     return False
         return True
+
+    def string_to_datetime(self, string, format):
+        """Converts string to datetime.
+
+        Args:
+            string (str): string to convert.
+            format (str): format of the string.
+
+        Returns:
+            datetime: datetime converted from string.
+        """
+
+        return datetime.strptime(string, format)
+
+    def datetime_to_string(self, datetime, format):
+        """Converts string to datetime.
+
+        Args:
+            datetime (datetime): datetime to convert.
+            format (str): format of the string.
+
+        Returns:
+            string: datetime converted from string.
+        """
+
+        return datetime.strftime(format)
+
+    def age_from_now(self, datetime):
+        """Get age from now in years, months and days
+
+        Args:
+            datetime (datetime): date to check.
+
+        Returns:
+            str: age in years, months & days.
+        """
+
+        days = (datetime.utcnow() - datetime).days
+        years = int(days / 365)
+        days -= years * 365
+        months = int(days / 30)
+        days -= months * 30
+        return "{} years, {} months and {} days".format(years, months, days)

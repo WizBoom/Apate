@@ -79,43 +79,25 @@ SharedInfo['reddit'] = praw.Reddit(
     user_agent=FlaskApplication.config['REDDIT_USER_AGENT']
 )
 
+# Util
+SharedInfo['util'] = Util(
+    FlaskApplication
+)
+
 # Jinja global variables
 FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston"].get_authorize_url())
 
 
 # Jinja global functions
-def string_to_datetime(string, format):
-    return datetime.strptime(string, format)
-
-
-def datetime_to_string(datetime, format):
-    return datetime.strftime(format)
-
-
-def age_from_now(datetime):
-    days = (datetime.utcnow() - datetime).days
-    years = int(days / 365)
-    days -= years * 365
-    months = int(days / 30)
-    days -= months * 30
-    return "{} years, {} months and {} days".format(years, months, days)
-
-
-FlaskApplication.jinja_env.globals.update(string_to_datetime=string_to_datetime)
-FlaskApplication.jinja_env.globals.update(datetime_to_string=datetime_to_string)
-FlaskApplication.jinja_env.globals.update(age_from_now=age_from_now)
+FlaskApplication.jinja_env.globals.update(string_to_datetime=SharedInfo['util'].string_to_datetime)
+FlaskApplication.jinja_env.globals.update(datetime_to_string=SharedInfo['util'].datetime_to_string)
+FlaskApplication.jinja_env.globals.update(age_from_now=SharedInfo['util'].age_from_now)
 
 # Blueprints
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 FlaskApplication.register_blueprint(corp_management_blueprint, url_prefix='/corp_management')
 FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
 FlaskApplication.register_blueprint(esi_parser_blueprint, url_prefix='/esi_parser')
-
-
-# Util
-SharedInfo['util'] = Util(
-    FlaskApplication
-)
 
 FlaskApplication.logger.info('Initialization complete')
 # -- End Initialisation -- #
