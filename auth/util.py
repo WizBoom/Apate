@@ -26,6 +26,32 @@ class Util:
 
         return esiRequest
 
+    def make_esi_request_with_operation_id(self, preston, operation_id, flash_html, request_link):
+        """Makes an esi request to an endpoint that requires a certain scope.
+
+        Args:
+            preston (Preston): Preston instance that holds the scopes of the refresh token.
+            operation_id (str): Operation ID of the endpoint.
+            flash_html (bool): If enabled, flash a html error on error.
+            request_link (str): Request link to send to ESI.
+
+        Returns:
+            json: Returns either None if the request was invalid, or the json of the request.
+        """
+
+        if self.has_scope(preston, operation_id):
+            payload = self.make_esi_request(request_link)
+            if payload.status_code != 200:
+                if flash_html:
+                    flash('There was an error ({}) making ESI request to {}'.format(str(payload.status_code), operation_id), 'danger')
+                return None
+            return payload.json()
+
+        if flash_html:
+            flash('That refresh token does not have the required scope for operation id {}'.format(operation_id), 'danger')
+        self.Application.logger.error("make_esi_request_with_operation_id > {} tried to parse operation {} and did not have the required scopes.".format(current_user.name, operation_id))
+        return None
+
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
         corporation does not exist, it will create one.
@@ -214,3 +240,26 @@ class Util:
                 self.Application.logger.info('{} removed role {}.'.format(executing_user_name, role.name))
             elif html_flash:
                 flash('You cannot remove an admin role!', 'danger')
+
+    def has_scope(self, preston, operation_id):
+        """Checks if preston instance has the correct scope for a certain operation id.
+
+        Args:
+            preston (Preston): Preston object to get the scopes from.
+            operation_id (str): Operation ID to check scopes for.
+
+        Returns:
+            bool: If true, the preston instance has the scope.
+        """
+
+        path = preston._get_path_for_op_id(operation_id)
+        if path is None:
+            self.Application.logger.error('has_scope > No path found for operation ID {}.'.format(operation_id))
+            return False
+
+        pathSpec = preston._get_spec()['paths'][path]
+        for key in pathSpec:
+            if pathSpec[key].get('security'):
+                if pathSpec[key]['security'][0]['evesso'][0] not in preston.scope:
+                    return False
+        return True

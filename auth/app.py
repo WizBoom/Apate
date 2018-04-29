@@ -11,8 +11,6 @@ from auth.esi_parser import Application as esi_parser_blueprint
 from auth.models import *
 from auth.util import Util
 
-from datetime import date
-
 import praw
 from preston import Preston
 

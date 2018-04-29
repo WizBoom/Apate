@@ -25,7 +25,12 @@
 			</div>
 			<div class='col'>
 				<h3>{{ character['name'] }}</h3>
-				SP ~ ISK<br>
+				{% if wallet_isk is not none %}
+					<strong>ISK:</strong> {{ '{0:,.2f}'.format(wallet_isk) }}<br>
+				{% endif %}
+				{% if character_skills is not none %}
+					<strong>SP:</strong> {{ '{0:,}'.format(character_skills['total_sp']) }} {% if 'unallocated_sp' in character_skills %} (+ {{ '{0:,}'.format(character_skills['unallocated_sp']) }} unallocated){% endif %}<br>
+				{% endif %}
 				<strong>Security:</strong> {{ '{0:,.2f}'.format(character['security_status']) }}<br>
 				<strong>Born:</strong> {{ datetime_to_string(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}<br>
 				<strong>Age: </strong> {{ age_from_now(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}<br>
