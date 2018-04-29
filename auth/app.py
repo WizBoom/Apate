@@ -3,11 +3,11 @@ from datetime import timedelta
 
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
-
 from auth.shared import Database, SharedInfo, EveAPI
 from auth.admin.app import Application as admin_blueprint
 from auth.corp_management.app import Application as corp_management_blueprint
 from auth.hr import Application as hr_blueprint
+from auth.esi_parser import Application as esi_parser_blueprint
 from auth.models import *
 from auth.util import Util
 
@@ -79,19 +79,25 @@ SharedInfo['reddit'] = praw.Reddit(
     user_agent=FlaskApplication.config['REDDIT_USER_AGENT']
 )
 
+# Util
+SharedInfo['util'] = Util(
+    FlaskApplication
+)
+
 # Jinja global variables
 FlaskApplication.jinja_env.globals.update(login_url=EveAPI["default_user_preston"].get_authorize_url())
+
+
+# Jinja global functions
+FlaskApplication.jinja_env.globals.update(string_to_datetime=SharedInfo['util'].string_to_datetime)
+FlaskApplication.jinja_env.globals.update(datetime_to_string=SharedInfo['util'].datetime_to_string)
+FlaskApplication.jinja_env.globals.update(age_from_now=SharedInfo['util'].age_from_now)
 
 # Blueprints
 FlaskApplication.register_blueprint(admin_blueprint, url_prefix='/admin')
 FlaskApplication.register_blueprint(corp_management_blueprint, url_prefix='/corp_management')
 FlaskApplication.register_blueprint(hr_blueprint, url_prefix='/hr')
-
-
-# Util
-SharedInfo['util'] = Util(
-    FlaskApplication
-)
+FlaskApplication.register_blueprint(esi_parser_blueprint, url_prefix='/esi_parser')
 
 FlaskApplication.logger.info('Initialization complete')
 # -- End Initialisation -- #

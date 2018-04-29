@@ -23,6 +23,7 @@ ReadMembershipPermission = Permission('read_membership')
 EditMemberPermission = Permission('edit_member')
 ReadApplicationsPermission = Permission('read_applications')
 ReviewApplicationsPermission = Permission('review_applications')
+ParseESIPermission = Permission('parse_esi')
 
 # Link permissions
 AdminRole.permissions.append(AdminPermission)
@@ -31,5 +32,6 @@ AdminRole.permissions.append(ReadMembershipPermission)
 AdminRole.permissions.append(EditMemberPermission)
 AdminRole.permissions.append(ReadApplicationsPermission)
 AdminRole.permissions.append(ReviewApplicationsPermission)
+AdminRole.permissions.append(ParseESIPermission)
 
 Database.session.commit()

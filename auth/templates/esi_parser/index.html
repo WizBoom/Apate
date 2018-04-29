@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+  <div class="text-center">
+    <h2>ESI Parser</h2>
+    <form method="POST">
+      <div class="form-row justify-content-md-center">
+        <div class="col-4">
+          <label for="characterIDText">Character ID</label>
+          <input type="number" class="form-control" id="characterIDText" name="characterIDText" placeholder="Character ID" required>
+        </div>
+      </div><br>
+      <div class="form-row justify-content-md-center">
+        <div class="col-4">
+          <label for="clientIDText">Client ID</label>
+          <input type="text" class="form-control" id="clientIDText" name="clientIDText" placeholder="Client ID" required>
+        </div>
+      </div><br>
+      <div class="form-row justify-content-md-center">
+        <div class="col-4">
+          <label for="clientSecretText">Client Secret</label>
+          <input type="text" class="form-control" id="clientSecretText" name="clientSecretText" placeholder="Client Secret" required>
+        </div>
+      </div><br>
+      <div class="form-row justify-content-md-center">
+        <div class="col-4">
+          <label for="refreshTokenText">Refresh Token</label>
+          <input type="text" class="form-control" id="refreshTokenText" name="refreshTokenText" placeholder="Refresh Token" required>
+        </div>
+      </div><br>
+      <div class="form-row justify-content-md-center">
+        <div class="col-4">
+          <label for="scopeTextArea">Scopes</label>
+          <textarea class="form-control" id="scopeTextArea" name="scopeTextArea" placeholder="Scopes" rows="3"></textarea>
+        </div>
+      </div><br>
+      <button type="submit" class="btn btn-outline-dark">Parse</button>
+    </form>
+  </div>
+{% endblock content %}

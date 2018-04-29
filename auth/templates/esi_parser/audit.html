@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+	<h2>Audit</h2>
+	<br>
+	<div class="container">
+		<div class="row" style="background-color: #e3e3e3; padding: 10px; border-radius: 15px 15px 15px 15px;">
+			<div class="col-auto mr-auto">
+				<img style="border-radius: 15px 15px 15px 15px;" src="{{ character_portrait['px128x128'] }}" alt="{{ character['name'] }} portrait"><br>
+				<div class="text-center" style="margin-top:5px;">
+					<a href="https://zkillboard.com/corporation/{{ character['corporation_id'] }}/" target="_blank">
+						<img style="border-radius: 15px 15px 15px 15px;" src="{{ corporation_logo['px128x128'] }}" alt="{{ corporation['name'] }} logo" width=62 height=62
+						data-toggle="tooltip" data-placement="top" title="{{ corporation['name'] }} [{{ corporation['ticker'] }}]">
+					</a>
+					<a href="https://zkillboard.com/alliance/{{ character['alliance_id'] }}/" target="_blank">
+						{% if alliance %}
+							<img href=#" style="border-radius: 15px 15px 15px 15px;" src="{{ alliance_logo['px128x128'] }}" alt="{{ alliance['name'] }} logo" width=62 height=62
+							data-toggle="tooltip" data-placement="top" title="{{ alliance['name'] }} [{{ alliance['ticker'] }}]">
+						{% endif %}
+					</a>
+				</div>
+			</div>
+			<div class='col'>
+				<h3>{{ character['name'] }}</h3>
+				{% if wallet_isk is not none %}
+					<strong>ISK:</strong> {{ '{0:,.2f}'.format(wallet_isk) }}<br>
+				{% endif %}
+				{% if character_skills is not none %}
+					<strong>SP:</strong> {{ '{0:,}'.format(character_skills['total_sp']) }} {% if 'unallocated_sp' in character_skills %} (+ {{ '{0:,}'.format(character_skills['unallocated_sp']) }} unallocated){% endif %}<br>
+				{% endif %}
+				<strong>Security:</strong> {{ '{0:,.2f}'.format(character['security_status']) }}<br>
+				<strong>Born:</strong> {{ datetime_to_string(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}<br>
+				<strong>Age: </strong> {{ age_from_now(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}<br>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

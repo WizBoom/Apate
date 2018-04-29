@@ -22,9 +22,35 @@ class Util:
         esiRequest = requests.get(request_link, headers={'User-Agent': SharedInfo['user_agent']})
 
         if esiRequest.status_code != 200:
-                self.Application.logger.error('make_esi_request > ESI request threw error {}'.format(str(corporationPayload.status_code)))
+                self.Application.logger.error('make_esi_request > ESI request threw error {}'.format(str(esiRequest.status_code)))
 
         return esiRequest
+
+    def make_esi_request_with_operation_id(self, preston, operation_id, flash_html, request_link):
+        """Makes an esi request to an endpoint that requires a certain scope.
+
+        Args:
+            preston (Preston): Preston instance that holds the scopes of the refresh token.
+            operation_id (str): Operation ID of the endpoint.
+            flash_html (bool): If enabled, flash a html error on error.
+            request_link (str): Request link to send to ESI.
+
+        Returns:
+            json: Returns either None if the request was invalid, or the json of the request.
+        """
+
+        if self.has_scope(preston, operation_id):
+            payload = self.make_esi_request(request_link)
+            if payload.status_code != 200:
+                if flash_html:
+                    flash('There was an error ({}) making ESI request to {}'.format(str(payload.status_code), operation_id), 'danger')
+                return None
+            return payload.json()
+
+        if flash_html:
+            flash('That refresh token does not have the required scope for operation id {}'.format(operation_id), 'danger')
+        self.Application.logger.error("make_esi_request_with_operation_id > {} tried to parse operation {} and did not have the required scopes.".format(current_user.name, operation_id))
+        return None
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
@@ -214,3 +240,69 @@ class Util:
                 self.Application.logger.info('{} removed role {}.'.format(executing_user_name, role.name))
             elif html_flash:
                 flash('You cannot remove an admin role!', 'danger')
+
+    def has_scope(self, preston, operation_id):
+        """Checks if preston instance has the correct scope for a certain operation id.
+
+        Args:
+            preston (Preston): Preston object to get the scopes from.
+            operation_id (str): Operation ID to check scopes for.
+
+        Returns:
+            bool: If true, the preston instance has the scope.
+        """
+
+        path = preston._get_path_for_op_id(operation_id)
+        if path is None:
+            self.Application.logger.error('has_scope > No path found for operation ID {}.'.format(operation_id))
+            return False
+
+        pathSpec = preston._get_spec()['paths'][path]
+        for key in pathSpec:
+            if pathSpec[key].get('security'):
+                if pathSpec[key]['security'][0]['evesso'][0] not in preston.scope:
+                    return False
+        return True
+
+    def string_to_datetime(self, string, format):
+        """Converts string to datetime.
+
+        Args:
+            string (str): string to convert.
+            format (str): format of the string.
+
+        Returns:
+            datetime: datetime converted from string.
+        """
+
+        return datetime.strptime(string, format)
+
+    def datetime_to_string(self, datetime, format):
+        """Converts string to datetime.
+
+        Args:
+            datetime (datetime): datetime to convert.
+            format (str): format of the string.
+
+        Returns:
+            string: datetime converted from string.
+        """
+
+        return datetime.strftime(format)
+
+    def age_from_now(self, datetime):
+        """Get age from now in years, months and days
+
+        Args:
+            datetime (datetime): date to check.
+
+        Returns:
+            str: age in years, months & days.
+        """
+
+        days = (datetime.utcnow() - datetime).days
+        years = int(days / 365)
+        days -= years * 365
+        months = int(days / 30)
+        days -= months * 30
+        return "{} years, {} months and {} days".format(years, months, days)
