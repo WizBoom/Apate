@@ -20,12 +20,14 @@ def index():
     return render_template('esi_parser/index.html')
 
 
-@Application.route('/audit/<int:character_id>/<refresh_token>/<scopes>')
-def audit(character_id, refresh_token, scopes):
+@Application.route('/audit/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+def audit(character_id, client_id, client_secret, refresh_token, scopes):
     """Views a member with ID.
 
     Args:
         character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
         refresh_token (str): Refresh token of the character.
         scopes (str): Scopes that the refresh token provides access to.
 
@@ -65,9 +67,9 @@ def audit(character_id, refresh_token, scopes):
     # Make preston instance.
     preston = Preston(
         user_agent=EveAPI['user_agent'],
-        client_id=EveAPI['full_auth_preston'].client_id,
-        client_secret=EveAPI['full_auth_preston'].client_secret,
-        scope=EveAPI['full_auth_preston'].scope,
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
         refresh_token=refresh_token
     )
 
