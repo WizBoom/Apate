@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
-from flask_login import current_user
+from flask_login import current_user, login_required
 from auth.shared import EveAPI, SharedInfo
 from preston import Preston
+from auth.decorators import needs_permission
 
 # Create and configure app
 Application = Blueprint('esi_parser', __name__, template_folder='templates/esi', static_folder='static')
 
 
 @Application.route('/', methods=['GET', 'POST'])
+@login_required
+@needs_permission('parse_esi', 'ESI Index')
 def index():
     """Landing page of the ESI parser.
 
@@ -17,6 +20,7 @@ def index():
     Returns:
         str: redirect to the appropriate url.
     """
+
     if request.method == 'POST':
         return redirect(url_for('esi_parser.audit', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
                         client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
@@ -25,6 +29,8 @@ def index():
 
 
 @Application.route('/audit/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
 def audit(character_id, client_id, client_secret, refresh_token, scopes):
     """Views a member with ID.
 
