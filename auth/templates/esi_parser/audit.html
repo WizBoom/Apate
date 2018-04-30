@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<style>
+.standing-terrible {
+  background-color: #9A0000;
+}
+
+.standing-bad {
+  background-color: #C44500;
+}
+
+.standing-neutral {
+  background-color: #868686;
+}
+
+.standing-good {
+  background-color: #1E64BC;
+}
+
+.standing-excellent {
+  background-color: #182972;
+}
+</style>
 {% endblock head %}
 
 {% block content %}
@@ -72,7 +93,34 @@
 			Clones tab
 			</div>
 			<div class="tab-pane fade" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
-			{{ character_contacts }}
+				<br>
+			    <div class="card-deck">
+					{% for contact in character_contacts %}
+						{% if contact['standing'] > 5 %}
+							<div class="card mb-4 text-white standing-excellent" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+						{% elif contact['standing'] > 0 %}
+							<div class="card mb-4 text-white standing-good" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+						{% elif contact['standing'] == 0 %}
+							<div class="card mb-4 text-white standing-neutral" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+						{% elif contact['standing'] > -5 %}
+							<div class="card mb-4 text-white standing-bad" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+						{% else %}
+							<div class="card mb-4 text-white standing-terrible" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+						{% endif %}
+							<div class="card-header"><h3><img class="rounded-circle" src="{{ contact['contact_image'] }}" width=50 height=50> {{ contact['contact_name'] }}</h3></div>
+							<div class="card-body">TEST</div>
+							{% if contact['contact_type'] != 'faction' %}
+								<div class="card-footer text-center"><a target="_blank" href="https://zkillboard.com/{{ contact['contact_type'] }}/{{ contact['contact_id'] }}/" class="btn btn-outline-light" role="button">View zkill</a></div>
+							{% endif %}
+						</div>
+						{% if ((loop.index -1) % 2) == 1 %}
+					        <div class="w-100 d-none d-sm-block d-md-none"><!-- wrap every 2 on sm--></div>
+					        <div class="w-100 d-none d-md-block d-lg-none"><!-- wrap every 3 on md--></div>
+							<div class="w-100 d-none d-lg-block d-xl-none"><!-- wrap every 4 on lg--></div>
+							<div class="w-100 d-none d-xl-block"><!-- wrap every 5 on xl--></div>
+						{% endif %}
+					{% endfor %}
+			    </div>
 			</div>
 			<div class="tab-pane fade" id="nav-contracts" role="tabpanel" aria-labelledby="nav-contracts-tab">
 			Contracts tab

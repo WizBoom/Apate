@@ -117,12 +117,36 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     if characterContactLabels is not None and 'error' in characterContactLabels:
         return redirect(url_for('esi_parser.index'))
 
-    # Link labels to contacts.
+    # Link characters, corporations, images and labels to contacts.
     for contact in characterContacts:
+        # Name.
+        if contact['contact_type'] == 'character':
+            contact['contact_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()['name']
+            contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/portrait/?datasource=tranquility".format(
+                str(contact['contact_id']))).json()['px128x128']
+        elif contact['contact_type'] == 'corporation':
+            contact['contact_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()['name']
+            contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+                str(contact['contact_id']))).json()['px128x128']
+        elif contact['contact_type'] == 'alliance':
+            contact['contact_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()['name']
+            contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/icons/?datasource=tranquility".format(
+                str(contact['contact_id']))).json()['px128x128']
+        elif contact['contact_type'] == 'faction':
+            contact['contact_name'] = "FACTION NAMES NOT IMPLEMENTED"
+            contact['contact_image'] = "#"
+
+        # Labels.
         if 'label_id' in contact:
             for label in characterContactLabels:
                 if label['label_id'] == contact['label_id']:
                     contact['label_name'] = label['label_name']
+
+    # Sort contacts by name.
+    characterContacts = sorted(characterContacts, key=lambda k: k['contact_name'])
+
+    # Sort contacts by standings.
+    characterContacts = sorted(characterContacts, key=lambda k: k['standing'], reverse=True)
 
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
