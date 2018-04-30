@@ -26,13 +26,12 @@ class Util:
 
         return esiRequest
 
-    def make_esi_request_with_operation_id(self, preston, operation_id, flash_html, request_link):
+    def make_esi_request_with_operation_id(self, preston, operation_id, request_link):
         """Makes an esi request to an endpoint that requires a certain scope.
 
         Args:
             preston (Preston): Preston instance that holds the scopes of the refresh token.
             operation_id (str): Operation ID of the endpoint.
-            flash_html (bool): If enabled, flash a html error on error.
             request_link (str): Request link to send to ESI.
 
         Returns:
@@ -45,10 +44,6 @@ class Util:
                 if flash_html:
                     flash('There was an error ({}) making ESI request to {}'.format(str(payload.status_code), operation_id), 'danger')
             return payload.json()
-
-        if flash_html:
-            flash('That refresh token does not have the required scope for operation id {}'.format(operation_id), 'danger')
-        self.Application.logger.error("make_esi_request_with_operation_id > {} tried to parse operation {} and did not have the required scopes.".format(current_user.name, operation_id))
         return None
 
     def update_character_corporation(self, character, corp_id):

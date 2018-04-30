@@ -23,7 +23,7 @@ def index():
 
     if request.method == 'POST':
         return redirect(url_for('esi_parser.audit', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
-                        client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
+                                client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
 
     return render_template('esi_parser/index.html')
 
@@ -91,20 +91,27 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character {} but the refresh token ({}) was not valid'.format(current_user.name, characterJSON['name'], refresh_token))
 
     # Get wallet.
-    walletISK = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet', True,
+    walletISK = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
                                                                       "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
     if walletISK is not None and type(walletISK) is not float:
         return redirect(url_for('esi_parser.index'))
 
     # Get skillpoints
-    characterSkills = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet', True,
+    characterSkills = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
                                                                             "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
                                                                                 str(character_id), access_token))
-    if 'error' in characterSkills:
+    if characterSkills is not None and 'error' in characterSkills:
+        return redirect(url_for('esi_parser.index'))
+
+    # Get contact endpoints.
+    characterContacts = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts',
+                                                                              "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
+                                                                                  str(character_id), access_token))
+    if characterContacts is not None and 'error' in characterContacts:
         return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
                            corporation=corporationJSON, corporation_logo=corporationLogo,
                            alliance=allianceJSON, alliance_logo=allianceLogo,
-                           wallet_isk=walletISK, character_skills=characterSkills)
+                           wallet_isk=walletISK, character_skills=characterSkills, character_contacts=characterContacts)
