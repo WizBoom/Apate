@@ -104,11 +104,25 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
         return redirect(url_for('esi_parser.index'))
 
     # Get contact endpoints.
-    characterContacts = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts',
+    # We use labels endpoint because the normal operation id requires write access as well for some reason.
+    characterContacts = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
                                                                               "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
                                                                                   str(character_id), access_token))
     if characterContacts is not None and 'error' in characterContacts:
         return redirect(url_for('esi_parser.index'))
+
+    characterContactLabels = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
+                                                                                   "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
+                                                                                       str(character_id), access_token))
+    if characterContactLabels is not None and 'error' in characterContactLabels:
+        return redirect(url_for('esi_parser.index'))
+
+    # Link labels to contacts.
+    for contact in characterContacts:
+        if 'label_id' in contact:
+            for label in characterContactLabels:
+                if label['label_id'] == contact['label_id']:
+                    contact['label_name'] = label['label_name']
 
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
