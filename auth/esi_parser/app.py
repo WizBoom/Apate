@@ -93,14 +93,14 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     # Get wallet.
     walletISK = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet', True,
                                                                       "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
-    if walletISK is None:
+    if walletISK is not None and type(walletISK) is not float:
         return redirect(url_for('esi_parser.index'))
 
     # Get skillpoints
     characterSkills = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet', True,
                                                                             "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
                                                                                 str(character_id), access_token))
-    if characterSkills is None:
+    if 'error' in characterSkills:
         return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit.html',

@@ -44,7 +44,6 @@ class Util:
             if payload.status_code != 200:
                 if flash_html:
                     flash('There was an error ({}) making ESI request to {}'.format(str(payload.status_code), operation_id), 'danger')
-                return None
             return payload.json()
 
         if flash_html:
