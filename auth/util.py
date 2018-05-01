@@ -40,9 +40,6 @@ class Util:
 
         if self.has_scope(preston, operation_id):
             payload = self.make_esi_request(request_link)
-            if payload.status_code != 200:
-                if flash_html:
-                    flash('There was an error ({}) making ESI request to {}'.format(str(payload.status_code), operation_id), 'danger')
             return payload.json()
         return None
 

@@ -121,7 +121,45 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     for contact in characterContacts:
         # Name.
         if contact['contact_type'] == 'character':
-            contact['contact_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()['name']
+            # Get character.
+            character = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()
+            contact['character'] = character
+
+            # Get character corp.
+            contact['character']['corporation_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                str(character['corporation_id']))).json()['name']
+
+            # Get character corp logo.
+            contact['character']['corporation_logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+                str(character['corporation_id']))).json()['px128x128']
+
+            # Get character alliance if applicable.
+            if 'alliance_id' in character:
+                contact['character']['alliance_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
+                    str(character['alliance_id']))).json()['name']
+
+                # Get character alliance logo.
+                contact['character']['alliance_logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/icons/?datasource=tranquility".format(
+                    str(character['alliance_id']))).json()['px128x128']
+
+            # Get corporation history.
+            corpHistory = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/corporationhistory/?datasource=tranquility".format(str(contact['contact_id']))).json()
+            for index, corp in enumerate(corpHistory):
+                # Name.
+                corp['name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(corp['corporation_id']))).json()['name']
+
+                # Logo.
+                corp['logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+                    str(corp['corporation_id']))).json()['px128x128']
+
+                # Leave date.
+                if index > 0:
+                    corp['end_date'] = corpHistory[index - 1]['start_date']
+            contact['character']['corporation_history'] = corpHistory
+
+            # Get contact name / image.
+            contact['contact_name'] = character['name']
             contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/portrait/?datasource=tranquility".format(
                 str(contact['contact_id']))).json()['px128x128']
         elif contact['contact_type'] == 'corporation':
