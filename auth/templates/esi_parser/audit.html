@@ -122,6 +122,10 @@
 													<td><a target="_blank" href="https://zkillboard.com/alliance/{{ contact['character']['alliance_id'] }}/"><img class="rounded-circle" src="{{ contact['character']['alliance_logo'] }}" width=25 height=25></a> {{ contact['character']['alliance_name'] }}</td>
 												</tr>
 											{% endif %}
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['character']['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
+											</tr>
 										</table><br>
 										<div class="collapse" id="{{ contact['contact_id'] }}_corpHistory">
 											{% if contact['character']['corporation_history'] %}
@@ -151,6 +155,10 @@
 												<td><a target="_blank" href="https://zkillboard.com/alliance/{{ contact['corporation']['alliance_id'] }}/"><img class="rounded-circle" src="{{ contact['corporation']['alliance_logo'] }}" width=25 height=25></a> {{ contact['corporation']['alliance_name'] }}</td>
 											</tr>
 											{% endif %}
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['corporation']['date_founded'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
+											</tr>
 										</table><br>
 										<div class="collapse" id="{{ contact['contact_id'] }}_allianceHistory">
 											{% if contact['corporation']['alliance_history'] %}
@@ -185,6 +193,10 @@
 											{% else %}
 												<td>Alliance closed</td>
 											{% endif %}
+											</tr>
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['alliance']['date_founded'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
 											</tr>
 										</table><br>
 										<div class="collapse" id="{{ contact['contact_id'] }}_corpMembers">
