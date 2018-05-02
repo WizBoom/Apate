@@ -159,7 +159,7 @@
 														<tr>
 															<td width="10%">
 															{% if 'alliance_id' in alliance %}
-		
+																<a target="_blank" href="https://zkillboard.com/alliance/{{ alliance['alliance_id'] }}/"><img class="rounded-circle" src="{{ alliance['logo'] }}" width=25 height=25></a>
 															{% endif %}
 															</td>
 															<td width="45%">{{ alliance['name'] }}{% if 'is_deleted' in alliance and alliance['is_deleted'] == true %} [CLOSED]{% endif %}</th>

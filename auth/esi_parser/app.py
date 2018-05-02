@@ -185,6 +185,8 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
                     allianceJSON = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
                         str(alliance['alliance_id']))).json()
 
+                    allianceJSON['alliance_id'] = alliance['alliance_id']
+
                 # Name.
                 if allianceJSON:
                     alliance['name'] = allianceJSON['name']
