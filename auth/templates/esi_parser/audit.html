@@ -168,6 +168,35 @@
 												Show alliance history
 											</button>
 										</div>
+									{% elif contact['contact_type'] == 'alliance' %}
+										<table width="100%">
+											<tr>
+												<th width="30%">Executor</th>
+											{% if 'executor_corporation_id' in contact['alliance'] and contact['alliance']['members'] %}
+												<td><a target="_blank" href="https://zkillboard.com/corporation/{{ contact['alliance']['executor_corporation_id'] }}/"><img class="rounded-circle" src="{{ contact['alliance']['executor_corporation_logo'] }}" width=25 height=25></a> {{ contact['alliance']['executor_corporation_name'] }}</td>
+											{% else %}
+												<td>Alliance closed</td>
+											{% endif %}
+											</tr>
+										</table><br>
+										<div class="collapse" id="{{ contact['contact_id'] }}_corpMembers">
+											{% for member in contact['alliance']['members']  %}
+												<table class="table borderless">
+													<tr>
+														<td width="10%">
+														<a target="_blank" href="https://zkillboard.com/corporation/{{ member['corporation_id'] }}/"><img class="rounded-circle" src="{{ member['corporation_logo'] }}" width=25 height=25></a>
+														</td>
+														<td width="45%">{{ member['name'] }}{% if 'is_deleted' in member and member['is_deleted'] == true %} [CLOSED]{% endif %}</th>
+														<td width="45%">{% if member['corporation_id'] == contact['alliance']['executor_corporation_id'] %}Executor corp{% endif %}</th>
+													</tr>
+												</table>
+											{% endfor %}
+										</div>
+										<div class="text-center">
+											<button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#{{ contact['contact_id'] }}_corpMembers" aria-expanded="false" aria-controls="{{ contact['contact_id'] }}_corpMembers">
+												Show corp members
+											</button>
+										</div>
 									{% else %}
 										{{ contact['contact_type'] }} not implemented
 									{% endif %}

@@ -207,7 +207,43 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
             contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
                 str(contact['contact_id']))).json()['px128x128']
         elif contact['contact_type'] == 'alliance':
-            contact['contact_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()['name']
+            # Get alliance.
+            alliance = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(str(contact['contact_id']))).json()
+            contact['alliance'] = alliance
+
+            # Exec corp.
+            if 'executor_corporation_id' in alliance:
+                # Name.
+                contact['alliance']['executor_corporation_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(alliance['executor_corporation_id']))).json()['name']
+
+                # Logo.
+                contact['alliance']['executor_corporation_logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+                    str(alliance['executor_corporation_id']))).json()['px128x128']
+
+            # Alliance members.
+            allianceMembers = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/corporations/?datasource=tranquility".format(
+                str(contact['contact_id']))).json()
+
+            allianceMemberList = []
+            for member in allianceMembers:
+                # Corporation info.
+                memberJSON = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(member))).json()
+
+                # ID.
+                memberJSON['corporation_id'] = member
+
+                # Logo.
+                memberJSON['corporation_logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+                    str(member))).json()['px128x128']
+
+                # Get corp.
+                allianceMemberList.append(memberJSON)
+
+            contact['alliance']['members'] = allianceMemberList
+
+            contact['contact_name'] = alliance['name']
             contact['contact_image'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/icons/?datasource=tranquility".format(
                 str(contact['contact_id']))).json()['px128x128']
         elif contact['contact_type'] == 'faction':
