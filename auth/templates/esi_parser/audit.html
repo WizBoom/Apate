@@ -1,6 +1,27 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<style>
+.standing-terrible {
+  background-color: #9A0000;
+}
+
+.standing-bad {
+  background-color: #C44500;
+}
+
+.standing-neutral {
+  background-color: #868686;
+}
+
+.standing-good {
+  background-color: #1E64BC;
+}
+
+.standing-excellent {
+  background-color: #182972;
+}
+</style>
 {% endblock head %}
 
 {% block content %}
@@ -72,7 +93,155 @@
 			Clones tab
 			</div>
 			<div class="tab-pane fade" id="nav-contacts" role="tabpanel" aria-labelledby="nav-contacts-tab">
-			Contacts tab
+				<br>
+				{% if characterContacts is not none %}
+				    <div class="card-deck">
+						{% for contact in character_contacts %}
+							{% if contact['standing'] > 5 %}
+								<div class="card mb-4 text-white standing-excellent" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+							{% elif contact['standing'] > 0 %}
+								<div class="card mb-4 text-white standing-good" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+							{% elif contact['standing'] == 0 %}
+								<div class="card mb-4 text-white standing-neutral" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+							{% elif contact['standing'] > -5 %}
+								<div class="card mb-4 text-white standing-bad" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+							{% else %}
+								<div class="card mb-4 text-white standing-terrible" style="max-width: 32em; border-radius: 15px 15px 15px 15px;">
+							{% endif %}
+								<div class="card-header"><h3><img class="rounded-circle" src="{{ contact['contact_image'] }}" width=50 height=50> {{ contact['contact_name'] }} ({{ contact['standing'] }})</h3>{% if 'label_name' in contact %}Label: <i>{{ contact['label_name'] }}</i>{% endif %}</div>
+								<div class="card-body">
+									{% if contact['contact_type'] == 'character' %}
+										<table width="100%">
+											<tr>
+												<th width="30%">Corporation</th>
+												<td><a target="_blank" href="https://zkillboard.com/corporation/{{ contact['character']['corporation_id'] }}/"><img class="rounded-circle" src="{{ contact['character']['corporation_logo'] }}" width=25 height=25></a> {{ contact['character']['corporation_name'] }}</td>
+											</tr>
+											{% if 'alliance_id' in contact['character'] %}
+												<tr>
+													<th>Alliance</th>
+													<td><a target="_blank" href="https://zkillboard.com/alliance/{{ contact['character']['alliance_id'] }}/"><img class="rounded-circle" src="{{ contact['character']['alliance_logo'] }}" width=25 height=25></a> {{ contact['character']['alliance_name'] }}</td>
+												</tr>
+											{% endif %}
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['character']['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
+											</tr>
+										</table><br>
+										<div class="collapse" id="{{ contact['contact_id'] }}_corpHistory">
+											{% if contact['character']['corporation_history'] %}
+												{% for corp in contact['character']['corporation_history'] %}
+													<table class="table borderless">
+														<tr>
+															<td width="10%"><a target="_blank" href="https://zkillboard.com/corporation/{{ corp['corporation_id'] }}/"><img class="rounded-circle" src="{{ corp['logo'] }}" width=25 height=25></a></td>
+															<td width="45%">{{ corp['name'] }}{% if 'is_deleted' in corp and corp['is_deleted'] == true %} [CLOSED]{% endif %}</th>
+															<td width="45%">{{ datetime_to_string(string_to_datetime(corp['start_date'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }} - {% if 'end_date' in corp %}{{ datetime_to_string(string_to_datetime(corp['end_date'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}{% else %}now{% endif %}</td>
+														</tr>
+													</table>
+												{% endfor %}
+											{% else %}
+												<div class="text-center">No corp history</div><br>
+											{% endif %}
+										</div>
+										<div class="text-center">
+											<button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#{{ contact['contact_id'] }}_corpHistory" aria-expanded="false" aria-controls="{{ contact['contact_id'] }}_corpHistory">
+												Show corp history
+											</button>
+										</div>
+									{% elif contact['contact_type'] == 'corporation' %}
+										<table width="100%">
+											{% if 'alliance_id' in contact['corporation'] %}
+											<tr>
+												<th width="30%">Alliance</th>
+												<td><a target="_blank" href="https://zkillboard.com/alliance/{{ contact['corporation']['alliance_id'] }}/"><img class="rounded-circle" src="{{ contact['corporation']['alliance_logo'] }}" width=25 height=25></a> {{ contact['corporation']['alliance_name'] }}</td>
+											</tr>
+											{% endif %}
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['corporation']['date_founded'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
+											</tr>
+										</table><br>
+										<div class="collapse" id="{{ contact['contact_id'] }}_allianceHistory">
+											{% if contact['corporation']['alliance_history'] %}
+												{% for alliance in contact['corporation']['alliance_history'] %}
+													<table class="table borderless">
+														<tr>
+															<td width="10%">
+															{% if 'alliance_id' in alliance %}
+																<a target="_blank" href="https://zkillboard.com/alliance/{{ alliance['alliance_id'] }}/"><img class="rounded-circle" src="{{ alliance['logo'] }}" width=25 height=25></a>
+															{% endif %}
+															</td>
+															<td width="45%">{{ alliance['name'] }}{% if 'is_deleted' in alliance and alliance['is_deleted'] == true %} [CLOSED]{% endif %}</th>
+															<td width="45%">{{ datetime_to_string(string_to_datetime(alliance['start_date'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }} - {% if 'end_date' in alliance %}{{ datetime_to_string(string_to_datetime(alliance['end_date'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}{% else %}now{% endif %}</td>
+														</tr>
+													</table>
+												{% endfor %}
+											{% else %}
+												<div class="text-center">No alliance history</div><br>
+											{% endif %}
+										</div>
+											<div class="text-center">
+												<button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#{{ contact['contact_id'] }}_allianceHistory" aria-expanded="false" aria-controls="{{ contact['contact_id'] }}_allianceHistory">
+													Show alliance history
+												</button>
+											</div>
+									{% elif contact['contact_type'] == 'alliance' %}
+										<table width="100%">
+											<tr>
+												<th width="30%">Executor</th>
+											{% if 'executor_corporation_id' in contact['alliance'] and contact['alliance']['members'] %}
+												<td><a target="_blank" href="https://zkillboard.com/corporation/{{ contact['alliance']['executor_corporation_id'] }}/"><img class="rounded-circle" src="{{ contact['alliance']['executor_corporation_logo'] }}" width=25 height=25></a> {{ contact['alliance']['executor_corporation_name'] }}</td>
+											{% else %}
+												<td>Alliance closed</td>
+											{% endif %}
+											</tr>
+											<tr>
+												<th>Age</th>
+												<td>{{ age_from_now(string_to_datetime(contact['alliance']['date_founded'], '%Y-%m-%dT%H:%M:%SZ')) }}</td>
+											</tr>
+										</table><br>
+										<div class="collapse" id="{{ contact['contact_id'] }}_corpMembers">
+											{% if contact['alliance']['members'] %}
+												{% for member in contact['alliance']['members'] %}
+													<table class="table borderless">
+														<tr>
+															<td width="10%">
+															<a target="_blank" href="https://zkillboard.com/corporation/{{ member['corporation_id'] }}/"><img class="rounded-circle" src="{{ member['corporation_logo'] }}" width=25 height=25></a>
+															</td>
+															<td width="45%">{{ member['name'] }}{% if 'is_deleted' in member and member['is_deleted'] == true %} [CLOSED]{% endif %}</th>
+															<td width="45%">{% if member['corporation_id'] == contact['alliance']['executor_corporation_id'] %}Executor corp{% endif %}</th>
+														</tr>
+													</table>
+												{% endfor %}
+											{% else %}
+												<div class="text-center">No corporation history</div>
+											{% endif %}
+										</div>
+										{% if contact['alliance']['members'] %}
+											<div class="text-center">
+												<button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#{{ contact['contact_id'] }}_corpMembers" aria-expanded="false" aria-controls="{{ contact['contact_id'] }}_corpMembers">
+													Show members
+												</button>
+											</div>
+										{% endif %}
+									{% else %}
+										{{ contact['contact_type'] }} not implemented
+									{% endif %}
+								</div>
+								{% if contact['contact_type'] != 'faction' %}
+									<div class="card-footer text-center"><a target="_blank" href="https://zkillboard.com/{{ contact['contact_type'] }}/{{ contact['contact_id'] }}/" class="btn btn-outline-light" role="button">View zkill</a></div>
+								{% endif %}
+							</div>
+							{% if ((loop.index -1) % 2) == 1 %}
+						        <div class="w-100 d-none d-sm-block d-md-none"><!-- wrap every 2 on sm--></div>
+						        <div class="w-100 d-none d-md-block d-lg-none"><!-- wrap every 3 on md--></div>
+								<div class="w-100 d-none d-lg-block d-xl-none"><!-- wrap every 4 on lg--></div>
+								<div class="w-100 d-none d-xl-block"><!-- wrap every 5 on xl--></div>
+							{% endif %}
+						{% endfor %}
+				    </div>
+				{% else %}
+					<h3 class="text-center">You don't have the necessary scopes for this tab.</h3>
+			    {% endif %}
 			</div>
 			<div class="tab-pane fade" id="nav-contracts" role="tabpanel" aria-labelledby="nav-contracts-tab">
 			Contracts tab
