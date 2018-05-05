@@ -43,6 +43,25 @@ class Util:
             return payload.json()
         return None
 
+    def make_esi_request_with_scope(self, preston, scopes, request_link):
+        """Makes an esi request to an endpoint that requires a certain scope.
+
+        Args:
+            preston (Preston): Preston instance that holds the scopes of the refresh token.
+            scopes (list<str>): List of required scopes.
+            request_link (str): Request link to send to ESI.
+
+        Returns:
+            json: Returns either None if the request was invalid, or the json of the request.
+        """
+
+        for scope in scopes:
+            if scope not in preston.scope:
+                return None
+
+        payload = self.make_esi_request(request_link)
+        return payload.json()
+
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
         corporation does not exist, it will create one.

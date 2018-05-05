@@ -91,29 +91,29 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character {} but the refresh token ({}) was not valid'.format(current_user.name, characterJSON['name'], refresh_token))
 
     # Get wallet.
-    walletISK = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
-                                                                      "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
+    walletISK = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-wallet.read_character_wallet.v1'],
+                                                               "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
     if walletISK is not None and type(walletISK) is not float:
         return redirect(url_for('esi_parser.index'))
 
     # Get skillpoints
-    characterSkills = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
-                                                                            "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
-                                                                                str(character_id), access_token))
+    characterSkills = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-skills.read_skills.v1'],
+                                                                     "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterSkills is not None and 'error' in characterSkills:
         return redirect(url_for('esi_parser.index'))
 
     # Get contact endpoints.
     # We use labels endpoint because the normal operation id requires write access as well for some reason.
-    characterContacts = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
-                                                                              "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
-                                                                                  str(character_id), access_token))
+    characterContacts = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
+                                                                       "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterContacts is not None and 'error' in characterContacts:
         return redirect(url_for('esi_parser.index'))
 
-    characterContactLabels = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
-                                                                                   "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
-                                                                                       str(character_id), access_token))
+    characterContactLabels = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
+                                                                            "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterContactLabels is not None and 'error' in characterContactLabels:
         return redirect(url_for('esi_parser.index'))
 
@@ -264,8 +264,14 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     # Sort contacts by standings.
     characterContacts = sorted(characterContacts, key=lambda k: k['standing'], reverse=True)
 
+    # Get mail endpoint.
+    characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                    "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
                            corporation=corporationJSON, corporation_logo=corporationLogo,
                            alliance=allianceJSON, alliance_logo=allianceLogo,
-                           wallet_isk=walletISK, character_skills=characterSkills, character_contacts=characterContacts)
+                           wallet_isk=walletISK, character_skills=characterSkills, character_contacts=characterContacts,
+                           character_mails=characterMails)
