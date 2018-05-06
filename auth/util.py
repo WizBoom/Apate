@@ -2,6 +2,7 @@ import requests
 from auth.models import *
 from auth.shared import Database, SharedInfo
 from flask import flash
+import re
 
 
 class Util:
@@ -301,7 +302,7 @@ class Util:
         return datetime.strftime(format)
 
     def age_from_now(self, datetime):
-        """Get age from now in years, months and days
+        """Get age from now in years, months and days.
 
         Args:
             datetime (datetime): date to check.
@@ -316,3 +317,15 @@ class Util:
         months = int(days / 30)
         days -= months * 30
         return "{} years, {} months and {} days".format(years, months, days)
+
+    def remove_html_tags(self, text):
+        """Remove all html tags from a string.
+
+        Args:
+            text (str): Text to remove the tags from.
+
+        Returns:
+            str: String without tags.
+        """
+        tag = re.compile(r'<[^>]+>')
+        return tag.sub('', text)

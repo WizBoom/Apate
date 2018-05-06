@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request, Markup
 from flask_login import current_user, login_required
 from auth.shared import EveAPI, SharedInfo
 from preston import Preston
@@ -268,6 +268,52 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
                                                                     "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
         str(character_id), access_token))
+
+    # Get mailing lists.
+    characterMailingLists = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                           "https://esi.tech.ccp.is/latest/characters/{}/mail/lists/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+
+    if characterMails is not None and 'error' in characterMails:
+        return redirect(url_for('esi_parser.index'))
+
+    for mail in characterMails:
+        mail['mail'] = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                      "https://esi.tech.ccp.is/latest/characters/{}/mail/{}/?datasource=tranquility&token={}".format(
+            str(character_id), str(mail['mail_id']), access_token))
+
+        # Convert body to be easily showed in html, but first save raw body.
+        mail['mail']['raw_body'] = mail['mail']['body']
+        mailBody = mail['mail']['body'].replace('<br>', '\n')
+        mailBody = SharedInfo['util'].remove_html_tags(mailBody)
+        mail['mail']['body'] = Markup(mailBody.replace('\n', '<br>'))
+
+        # Get sender name.
+        mail['mail']['from_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+            str(mail['mail']['from']))).json()['name']
+
+        # Get recipients.
+        for recipient in mail['mail']['recipients']:
+            recipient['recipient_name'] = recipient['recipient_id']
+
+            # Determine type.
+            if recipient['recipient_type'] == 'character':
+                # Get character name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'corporation':
+                # Get corporation name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'alliance':
+                # Get alliance name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'mailing_list':
+                # Get mailing list name.
+                for mailingList in characterMailingLists:
+                    if mailingList['mailing_list_id'] == recipient['recipient_id']:
+                        recipient['recipient_name'] = "{} [ML]".format(mailingList['name'])
 
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
