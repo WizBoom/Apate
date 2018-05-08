@@ -289,7 +289,7 @@ jQuery(document).ready(function($) {
 				    <tbody>
 				    {% for mail in character_mails %}
 				        <tr data-toggle="collapse" data-target="#MailAccordion{{ mail['mail_id'] }}" class="clickable">
-				        	<td>{% if mail['mail']['is_read'] == true %}<img src="/static/open-iconic/png/envelope-closed-2x.png">{% else %}<img src="/static/open-iconic/png/envelope-open-2x.png">{% endif %}</td>
+				        	<td>{% if 'is_read' in mail and mail['is_read'] == true %}<img src="/static/open-iconic/png/envelope-open-2x.png">{% else %}<img src="/static/open-iconic/png/envelope-closed-2x.png">{% endif %}</td>
 				            <td>{{ datetime_to_string(string_to_datetime(mail['mail']['timestamp'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d %H:%M') }}</td>
 				            <td>{{ mail['mail']['from_name'] }}</td>
 				            <td>{{ mail['mail']['subject'] }}</td>
