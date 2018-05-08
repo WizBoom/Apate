@@ -2,6 +2,7 @@ import requests
 from auth.models import *
 from auth.shared import Database, SharedInfo
 from flask import flash
+import re
 
 
 class Util:
@@ -42,6 +43,25 @@ class Util:
             payload = self.make_esi_request(request_link)
             return payload.json()
         return None
+
+    def make_esi_request_with_scope(self, preston, scopes, request_link):
+        """Makes an esi request to an endpoint that requires a certain scope.
+
+        Args:
+            preston (Preston): Preston instance that holds the scopes of the refresh token.
+            scopes (list<str>): List of required scopes.
+            request_link (str): Request link to send to ESI.
+
+        Returns:
+            json: Returns either None if the request was invalid, or the json of the request.
+        """
+
+        for scope in scopes:
+            if scope not in preston.scope:
+                return None
+
+        payload = self.make_esi_request(request_link)
+        return payload.json()
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
@@ -282,7 +302,7 @@ class Util:
         return datetime.strftime(format)
 
     def age_from_now(self, datetime):
-        """Get age from now in years, months and days
+        """Get age from now in years, months and days.
 
         Args:
             datetime (datetime): date to check.
@@ -297,3 +317,15 @@ class Util:
         months = int(days / 30)
         days -= months * 30
         return "{} years, {} months and {} days".format(years, months, days)
+
+    def remove_html_tags(self, text):
+        """Remove all html tags from a string.
+
+        Args:
+            text (str): Text to remove the tags from.
+
+        Returns:
+            str: String without tags.
+        """
+        tag = re.compile(r'<[^>]+>')
+        return tag.sub('', text)

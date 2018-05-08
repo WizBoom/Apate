@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app, request, Markup
 from flask_login import current_user, login_required
 from auth.shared import EveAPI, SharedInfo
 from preston import Preston
@@ -91,29 +91,29 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character {} but the refresh token ({}) was not valid'.format(current_user.name, characterJSON['name'], refresh_token))
 
     # Get wallet.
-    walletISK = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
-                                                                      "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
+    walletISK = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-wallet.read_character_wallet.v1'],
+                                                               "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(str(character_id), access_token))
     if walletISK is not None and type(walletISK) is not float:
         return redirect(url_for('esi_parser.index'))
 
     # Get skillpoints
-    characterSkills = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_wallet',
-                                                                            "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
-                                                                                str(character_id), access_token))
+    characterSkills = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-skills.read_skills.v1'],
+                                                                     "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterSkills is not None and 'error' in characterSkills:
         return redirect(url_for('esi_parser.index'))
 
     # Get contact endpoints.
     # We use labels endpoint because the normal operation id requires write access as well for some reason.
-    characterContacts = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
-                                                                              "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
-                                                                                  str(character_id), access_token))
+    characterContacts = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
+                                                                       "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterContacts is not None and 'error' in characterContacts:
         return redirect(url_for('esi_parser.index'))
 
-    characterContactLabels = SharedInfo['util'].make_esi_request_with_operation_id(preston, 'get_characters_character_id_contacts_labels',
-                                                                                   "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
-                                                                                       str(character_id), access_token))
+    characterContactLabels = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
+                                                                            "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
     if characterContactLabels is not None and 'error' in characterContactLabels:
         return redirect(url_for('esi_parser.index'))
 
@@ -264,8 +264,60 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
     # Sort contacts by standings.
     characterContacts = sorted(characterContacts, key=lambda k: k['standing'], reverse=True)
 
+    # Get mail endpoint.
+    characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                    "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+
+    # Get mailing lists.
+    characterMailingLists = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                           "https://esi.tech.ccp.is/latest/characters/{}/mail/lists/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+
+    if characterMails is not None and 'error' in characterMails:
+        return redirect(url_for('esi_parser.index'))
+
+    for mail in characterMails:
+        mail['mail'] = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                      "https://esi.tech.ccp.is/latest/characters/{}/mail/{}/?datasource=tranquility&token={}".format(
+            str(character_id), str(mail['mail_id']), access_token))
+
+        # Convert body to be easily showed in html, but first save raw body.
+        mail['mail']['raw_body'] = mail['mail']['body']
+        mailBody = mail['mail']['body'].replace('<br>', '\n')
+        mailBody = SharedInfo['util'].remove_html_tags(mailBody)
+        mail['mail']['body'] = Markup(mailBody.replace('\n', '<br>'))
+
+        # Get sender name.
+        mail['mail']['from_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+            str(mail['mail']['from']))).json()['name']
+
+        # Get recipients.
+        for recipient in mail['mail']['recipients']:
+            recipient['recipient_name'] = recipient['recipient_id']
+
+            # Determine type.
+            if recipient['recipient_type'] == 'character':
+                # Get character name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'corporation':
+                # Get corporation name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'alliance':
+                # Get alliance name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'mailing_list':
+                # Get mailing list name.
+                for mailingList in characterMailingLists:
+                    if mailingList['mailing_list_id'] == recipient['recipient_id']:
+                        recipient['recipient_name'] = "{} [ML]".format(mailingList['name'])
+
     return render_template('esi_parser/audit.html',
                            character=characterJSON, character_portrait=characterPortrait,
                            corporation=corporationJSON, corporation_logo=corporationLogo,
                            alliance=allianceJSON, alliance_logo=allianceLogo,
-                           wallet_isk=walletISK, character_skills=characterSkills, character_contacts=characterContacts)
+                           wallet_isk=walletISK, character_skills=characterSkills, character_contacts=characterContacts,
+                           character_mails=characterMails)
