@@ -32,13 +32,40 @@ def index():
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_assets(character_id, client_id, client_secret, refresh_token, scopes):
-    return "ASSETS"
+    """Audit a character's assets.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
+    return render_template('esi_parser/audit_assets.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/bookmarks/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's bookmarks.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "BOOKMARKS"
 
 
@@ -46,6 +73,19 @@ def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scope
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_character(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's character.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "CHARACTER"
 
 
@@ -53,6 +93,19 @@ def audit_character(character_id, client_id, client_secret, refresh_token, scope
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's clones.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "CLONES"
 
 
@@ -60,6 +113,19 @@ def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's contacts.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "CONTACTS"
 
 
@@ -67,6 +133,19 @@ def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_contracts(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's contracts.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "CONTRACTS"
 
 
@@ -74,6 +153,19 @@ def audit_contracts(character_id, client_id, client_secret, refresh_token, scope
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_corporation(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's corporation.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "CORPORATION"
 
 
@@ -81,6 +173,19 @@ def audit_corporation(character_id, client_id, client_secret, refresh_token, sco
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's FW stats.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "FW"
 
 
@@ -88,6 +193,19 @@ def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's fittings.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "FITTINGS"
 
 
@@ -95,6 +213,19 @@ def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_industry(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's industry.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "INDUSTRY"
 
 
@@ -102,6 +233,19 @@ def audit_industry(character_id, client_id, client_secret, refresh_token, scopes
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_location(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's location.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "LOCATION"
 
 
@@ -109,6 +253,19 @@ def audit_location(character_id, client_id, client_secret, refresh_token, scopes
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's LP.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "LP"
 
 
@@ -116,6 +273,19 @@ def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's mail.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "MAIL"
 
 
@@ -123,6 +293,19 @@ def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's market.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "MARKET"
 
 
@@ -130,6 +313,19 @@ def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_opportunities(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's opportunities.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "OPPORTUNITIES"
 
 
@@ -137,6 +333,19 @@ def audit_opportunities(character_id, client_id, client_secret, refresh_token, s
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's PI.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "PI"
 
 
@@ -144,6 +353,19 @@ def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's skills.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "SKILLS"
 
 
@@ -151,6 +373,19 @@ def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
 def audit_wallet(character_id, client_id, client_secret, refresh_token, scopes):
+    """Audit a character's wallet.
+
+    Args:
+        character_id (int): ID of the character.
+        client_id (str): Client ID of the SSO that was used to retrieve the refresh token.
+        client_secret (str): Client secret of the SSO that was used to retrieve the refresh token.
+        refresh_token (str): Refresh token of the character.
+        scopes (str): Scopes that the refresh token provides access to.
+
+    Returns:
+        str: redirect to the appropriate url.
+    """
+
     return "WALLET"
 
 
