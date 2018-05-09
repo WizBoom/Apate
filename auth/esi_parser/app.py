@@ -61,6 +61,8 @@ def audit_assets(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_assets.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -100,6 +102,8 @@ def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scope
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_bookmarks.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -139,6 +143,8 @@ def audit_character(character_id, client_id, client_secret, refresh_token, scope
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_character.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -178,6 +184,8 @@ def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_clones.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -217,10 +225,16 @@ def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
+
+    characterContacts = get_contacts(character_id, preston, access_token)
+    if characterContacts is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_contacts.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
-                           character=characterCard)
+                           character=characterCard, character_contacts=characterContacts)
 
 
 @Application.route('/audit/contracts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -256,6 +270,8 @@ def audit_contracts(character_id, client_id, client_secret, refresh_token, scope
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_contracts.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -295,6 +311,8 @@ def audit_corporation(character_id, client_id, client_secret, refresh_token, sco
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_corporation.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -334,6 +352,8 @@ def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_fw.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -373,6 +393,8 @@ def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_fittings.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -412,6 +434,8 @@ def audit_industry(character_id, client_id, client_secret, refresh_token, scopes
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_industry.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -451,6 +475,8 @@ def audit_location(character_id, client_id, client_secret, refresh_token, scopes
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_location.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -490,6 +516,8 @@ def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_lp.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -529,6 +557,8 @@ def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_mail.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -568,6 +598,8 @@ def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_market.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -607,6 +639,8 @@ def audit_opportunities(character_id, client_id, client_secret, refresh_token, s
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_opportunities.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -646,6 +680,8 @@ def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_pi.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -685,6 +721,8 @@ def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_skills.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
@@ -724,6 +762,8 @@ def audit_wallet(character_id, client_id, client_secret, refresh_token, scopes):
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
+    if characterCard is None:
+        return redirect(url_for('esi_parser.index'))
 
     return render_template('esi_parser/audit_wallet.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
