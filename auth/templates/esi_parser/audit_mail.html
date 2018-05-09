@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 {% block head %}
+<script>
+jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.location = $(this).data("href");
+    });
+});
+</script>
 {% endblock head %}
 
 {% block navbar %}
@@ -63,5 +70,41 @@
 					<strong>Age: </strong> {{ age_from_now(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}<br>
 				</div>
 			</div><br>
+				<br>
+				{% if 'has_scope' not in character_mails %}
+					<table class="table borderless table-hover table-sm">
+					    <thead>
+					    	<th width="3%"></th>
+							<th scope="col" width="13%">Date</th>
+							<th scope="col">Sender</th>
+							<th scope="col">Title</th>
+							<th scope="col">Recipients</th>
+					    </thead>			    
+					    <tbody>
+					    {% for mail in character_mails %}
+					        <tr data-toggle="collapse" data-target="#MailAccordion{{ mail['mail_id'] }}" class="clickable">
+					        	<td>{% if 'is_read' in mail and mail['is_read'] == true %}<img src="/static/open-iconic/png/envelope-open-2x.png">{% else %}<img src="/static/open-iconic/png/envelope-closed-2x.png">{% endif %}</td>
+					            <td>{{ datetime_to_string(string_to_datetime(mail['mail']['timestamp'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d %H:%M') }}</td>
+					            <td>{{ mail['mail']['from_name'] }}</td>
+					            <td>{{ mail['mail']['subject'] }}</td>
+					            <td>
+					            	{% for recipient in mail['mail']['recipients'] %}
+					            		{% if recipient['recipient_type'] == 'mailing_list' %}{{ recipient['recipient_name'] }}{% else %}<a href="https://zkillboard.com/{{ recipient['recipient_type'] }}/{{ recipient['recipient_id'] }}/" target="_blank">{{ recipient['recipient_name'] }}</a>{% endif %}{% if not loop.last %}, {% endif %}
+					            	{% endfor %}
+					            </td>        
+					        </tr>
+					        <tr>
+					            <td colspan="4" class="hiddenRow">
+					                <div id="MailAccordion{{ mail['mail_id'] }}" class="collapse">
+					                	{{ mail['mail']['body'] }}
+					                </div>
+					            </td>
+					        </tr>
+					    {% endfor %}
+					    </tbody>
+					</table>
+				{% else %}
+					<h3 class="text-center">You don't have the necessary scopes for this tab.</h3>
+				{% endif %}
 	</div>
 {% endblock content %}

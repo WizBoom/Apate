@@ -563,9 +563,13 @@ def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
     if characterCard is None:
         return redirect(url_for('esi_parser.index'))
 
+    characterMails = get_mails(character_id, preston, access_token)
+    if characterMails is None:
+        return redirect(url_for('esi_parser.index'))
+
     return render_template('esi_parser/audit_mail.html',
                            character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
-                           character=characterCard)
+                           character=characterCard, character_mails=characterMails)
 
 
 @Application.route('/audit/market/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
