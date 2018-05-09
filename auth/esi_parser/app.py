@@ -45,8 +45,26 @@ def audit_assets(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_assets.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/bookmarks/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -66,8 +84,26 @@ def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_bookmarks.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/character/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -87,8 +123,26 @@ def audit_character(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_character.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/clones/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -108,8 +162,26 @@ def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_clones.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/contacts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -129,8 +201,26 @@ def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_contacts.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/contracts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -150,8 +240,26 @@ def audit_contracts(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_contracts.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/corporation/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -171,8 +279,26 @@ def audit_corporation(character_id, client_id, client_secret, refresh_token, sco
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_corporation.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/fw/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -192,8 +318,26 @@ def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_fw.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/fittings/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -213,8 +357,26 @@ def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_fittings.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/industry/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -234,8 +396,26 @@ def audit_industry(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_industry.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/location/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -255,8 +435,26 @@ def audit_location(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_location.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/lp/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -276,8 +474,26 @@ def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_lp.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/mail/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -297,8 +513,26 @@ def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_mail.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/market/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -318,8 +552,26 @@ def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_market.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/opportunities/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -339,8 +591,26 @@ def audit_opportunities(character_id, client_id, client_secret, refresh_token, s
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_opportunities.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/pi/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -360,8 +630,26 @@ def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_pi.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/skills/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -381,8 +669,26 @@ def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_skills.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/wallet/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -402,8 +708,26 @@ def audit_wallet(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
+    # Make preston instance.
+    preston = Preston(
+        user_agent=EveAPI['user_agent'],
+        client_id=client_id,
+        client_secret=client_secret,
+        scope=scopes,
+        refresh_token=refresh_token
+    )
+
+    # Get access token.
+    access_token = preston._get_access_from_refresh()[0]
+    if access_token is None:
+        flash('Refresh token ({}) could not get an access token.'.format(refresh_token), 'danger')
+        current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
+
+    characterCard = get_character_card(character_id, preston, access_token)
+
     return render_template('esi_parser/audit_wallet.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard)
 
 
 @Application.route('/audit/onepage/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
