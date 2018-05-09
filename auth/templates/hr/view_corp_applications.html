@@ -44,7 +44,12 @@
 				<td>{{application.timestamp.strftime('%Y/%m/%d')}}</td>
 				<td>{% if application.ready_accepted %}Ready to be accepted{% else %}Being processed{% endif %}</td>
 				<td><a href="https://www.reddit.com/u/{{application.character.reddit}}" target="_blank">{{application.character.reddit}}</a></td>
-				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="#" role="button" aria-pressed="true">View ESI</a></td>
+				{% if application.character.refresh_token is not none %}
+					<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="{{ url_for('esi_parser.audit_assets', character_id=application.character.id, client_id=client_id,
+                                client_secret=client_secret, refresh_token=application.character.refresh_token, scopes=scopes) }}" role="button" aria-pressed="true">View ESI</a></td>
+				{% else %}
+					<td>No ESI</td>
+				{% endif %}
 				<td><a class="btn btn-outline-dark btn-sm" target="_blank" href="https://zkillboard.com/character/{{ application.character.id }}/" role="button" aria-pressed="true">View Killboard</a></td>
 				<td><a class="btn btn-outline-dark btn-sm" href="{{ url_for('hr.view_application', application_id=application.id) }}" role="button" aria-pressed="true">View Full Application</a></td>
 			</tr>

@@ -145,7 +145,8 @@ def view_corp_applications():
         str: redirect to the appropriate url.
     """
 
-    return render_template('hr/view_corp_applications.html', corporation=current_user.get_corp())
+    return render_template('hr/view_corp_applications.html', corporation=current_user.get_corp(),
+        client_id=EveAPI['full_auth_preston'].client_id, client_secret=EveAPI['full_auth_preston'].client_secret, scopes=EveAPI['full_auth_preston'].scope)
 
 
 @Application.route('/view_corp_members')
@@ -261,7 +262,8 @@ def view_application(application_id):
         return redirect(url_for('hr.index'))
 
     return render_template('hr/view_application.html', application=application, personal_application=isPersonalApplication,
-                           remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'])
+                           remove_form=removeApplicationForm, edit_form=editApplicationForm, discord_url=current_app.config['DISCORD_RECRUITMENT_INVITE'],
+                           client_id=EveAPI['full_auth_preston'].client_id, client_secret=EveAPI['full_auth_preston'].client_secret, scopes=EveAPI['full_auth_preston'].scope)
 
 
 @Application.route('/view_member/<int:member_id>', methods=['GET', 'POST'])
@@ -341,4 +343,6 @@ def view_member(member_id):
             return redirect(url_for('hr.index'))
 
         return redirect(url_for('hr.view_member', member_id=character.id))
-    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts, mains=mains)
+
+    return render_template('hr/view_member.html', character=character, roles=roles, note_form=editNoteForm, alts=alts, mains=mains,
+                           client_id=EveAPI['full_auth_preston'].client_id, client_secret=EveAPI['full_auth_preston'].client_secret, scopes=EveAPI['full_auth_preston'].scope)
