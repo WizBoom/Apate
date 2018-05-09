@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block navbar %}
+<li class="nav-item">
+	<a class="nav-link" href="{{ url_for('esi_parser.audit_onepage', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">One page</a>
+</li>
+<li class="nav-item dropdown">
+	<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Endpoints</a>
+	<div class="dropdown-menu">
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_assets', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Assets</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_bookmarks', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Bookmarks</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_character', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Character</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_clones', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Clones</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_contacts', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Contacts</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_contracts', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Contracts</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_corporation', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Corporation</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_fw', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Faction Warfare</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_fittings', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Fittings</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_industry', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Industry</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_location', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Location</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_lp', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">LP</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_mail', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Mail</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_market', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Market</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_opportunities', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Opportunities</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_pi', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">PI</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_skills', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Skills</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_wallet', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Wallet</a>
+	</div>
+</li>
+{% endblock %}
+
+{% block content %}
+	<h2>Character</h2>
+	<div class="container">
+			<div class="row" style="background-color: #e3e3e3; padding: 10px; border-radius: 15px 15px 15px 15px;">
+				<div class="col-auto mr-auto">
+					<img style="border-radius: 15px 15px 15px 15px;" src="{{ character['portrait']['px128x128'] }}" alt="{{ character['name'] }} portrait"><br>
+					<div class="text-center" style="margin-top:5px;">
+						<a href="https://zkillboard.com/corporation/{{ character['corporation_id'] }}/" target="_blank">
+							<img style="border-radius: 15px 15px 15px 15px;" src="{{ character['corporation']['logo']['px128x128'] }}" alt="{{ character['corporation']['name'] }} logo" width=62 height=62
+							data-toggle="tooltip" data-placement="top" title="{{ character['corporation']['name'] }} [{{ character['corporation']['ticker'] }}]">
+						</a>
+						{% if 'alliance' in character %}
+							<a href="https://zkillboard.com/alliance/{{ character['alliance_id'] }}/" target="_blank">
+								<img style="border-radius: 15px 15px 15px 15px;" src="{{ character['alliance']['logo']['px128x128'] }}" alt="{{ character['alliance']['name'] }} logo" width=62 height=62 data-toggle="tooltip" data-placement="top" title="{{ character['alliance']['name'] }} [{{ character['alliance']['ticker'] }}]">
+							</a>
+						{% endif %}
+					</div>
+				</div>
+				<div class='col'>
+					<h3>{{ character['name'] }}</h3>
+					{% if 'wallet_isk' in character %}
+						<strong>ISK:</strong> {{ '{0:,.2f}'.format(character['wallet_isk']) }}<br>
+					{% endif %}
+					{% if 'skills' in character %}
+						<strong>SP:</strong> {{ '{0:,}'.format(character['skills']['total_sp']) }} {% if 'unallocated_sp' in character['skills'] %} (+ {{ '{0:,}'.format(character['skills']['unallocated_sp']) }} unallocated){% endif %}<br>
+					{% endif %}
+					<strong>Security:</strong> {{ '{0:,.2f}'.format(character['security_status']) }}<br>
+					<strong>Born:</strong> {{ datetime_to_string(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%d') }}<br>
+					<strong>Age: </strong> {{ age_from_now(string_to_datetime(character['birthday'], '%Y-%m-%dT%H:%M:%SZ')) }}<br>
+				</div>
+			</div><br>
+	</div>
+{% endblock content %}
