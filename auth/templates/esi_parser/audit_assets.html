@@ -4,10 +4,10 @@
 {% endblock head %}
 
 {% block navbar %}
+<li class="nav-item">
+	<a class="nav-link" href="{{ url_for('esi_parser.audit_onepage', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">One page</a>
+</li>
 <li class="nav-item dropdown">
-	<li class="nav-item">
-		<a class="nav-link" href="{{ url_for('esi_parser.audit_onepage', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">One page</a>
-	</li>
 	<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Endpoints</a>
 	<div class="dropdown-menu">
 		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_assets', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Assets</a>
