@@ -22,7 +22,7 @@ def index():
     """
 
     if request.method == 'POST':
-        return redirect(url_for('esi_parser.audit_onepage', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
+        return redirect(url_for('esi_parser.audit_assets', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
                                 client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
 
     return render_template('esi_parser/index.html')
@@ -66,7 +66,8 @@ def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
-    return "BOOKMARKS"
+    return render_template('esi_parser/audit_bookmarks.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/character/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -86,7 +87,8 @@ def audit_character(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
-    return "CHARACTER"
+    return render_template('esi_parser/audit_character.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/clones/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -106,7 +108,8 @@ def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "CLONES"
+    return render_template('esi_parser/audit_clones.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/contacts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -126,7 +129,8 @@ def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
-    return "CONTACTS"
+    return render_template('esi_parser/audit_contacts.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/contracts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -146,7 +150,8 @@ def audit_contracts(character_id, client_id, client_secret, refresh_token, scope
         str: redirect to the appropriate url.
     """
 
-    return "CONTRACTS"
+    return render_template('esi_parser/audit_contracts.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/corporation/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -166,7 +171,8 @@ def audit_corporation(character_id, client_id, client_secret, refresh_token, sco
         str: redirect to the appropriate url.
     """
 
-    return "CORPORATION"
+    return render_template('esi_parser/audit_corporation.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/fw/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -186,7 +192,8 @@ def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "FW"
+    return render_template('esi_parser/audit_fw.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/fittings/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -206,7 +213,8 @@ def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
-    return "FITTINGS"
+    return render_template('esi_parser/audit_fittings.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/industry/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -226,7 +234,8 @@ def audit_industry(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
-    return "INDUSTRY"
+    return render_template('esi_parser/audit_industry.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/location/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -246,7 +255,8 @@ def audit_location(character_id, client_id, client_secret, refresh_token, scopes
         str: redirect to the appropriate url.
     """
 
-    return "LOCATION"
+    return render_template('esi_parser/audit_location.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/lp/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -266,7 +276,8 @@ def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "LP"
+    return render_template('esi_parser/audit_lp.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/mail/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -286,7 +297,8 @@ def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "MAIL"
+    return render_template('esi_parser/audit_mail.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/market/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -306,7 +318,8 @@ def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "MARKET"
+    return render_template('esi_parser/audit_market.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/opportunities/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -326,7 +339,8 @@ def audit_opportunities(character_id, client_id, client_secret, refresh_token, s
         str: redirect to the appropriate url.
     """
 
-    return "OPPORTUNITIES"
+    return render_template('esi_parser/audit_opportunities.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/pi/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -346,7 +360,8 @@ def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "PI"
+    return render_template('esi_parser/audit_pi.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/skills/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -366,7 +381,8 @@ def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "SKILLS"
+    return render_template('esi_parser/audit_skills.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/wallet/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
@@ -386,7 +402,8 @@ def audit_wallet(character_id, client_id, client_secret, refresh_token, scopes):
         str: redirect to the appropriate url.
     """
 
-    return "WALLET"
+    return render_template('esi_parser/audit_wallet.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes)
 
 
 @Application.route('/audit/onepage/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')

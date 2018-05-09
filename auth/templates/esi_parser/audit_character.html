@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock head %}
+
+{% block navbar %}
+<li class="nav-item">
+	<a class="nav-link" href="{{ url_for('esi_parser.audit_onepage', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">One page</a>
+</li>
+<li class="nav-item dropdown">
+	<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Endpoints</a>
+	<div class="dropdown-menu">
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_assets', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Assets</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_bookmarks', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Bookmarks</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_character', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Character</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_clones', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Clones</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_contacts', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Contacts</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_contracts', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Contracts</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_corporation', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Corporation</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_fw', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Faction Warfare</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_fittings', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Fittings</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_industry', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Industry</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_location', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Location</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_lp', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">LP</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_mail', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Mail</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_market', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Market</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_opportunities', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Opportunities</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_pi', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">PI</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_skills', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Skills</a>
+		<a class="dropdown-item" href="{{ url_for('esi_parser.audit_wallet', character_id=character_id, client_id=client_id,client_secret=client_secret, refresh_token=refresh_token, scopes=scopes) }}">Wallet</a>
+	</div>
+</li>
+{% endblock %}
+
+{% block content %}
+	<h2>Character</h2>
+{% endblock content %}
