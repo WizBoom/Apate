@@ -763,26 +763,168 @@ def audit_onepage(character_id, client_id, client_secret, refresh_token, scopes)
         current_app.logger.error('{} tried to parse ESI for character with ID {} but the refresh token ({}) was not valid.'.format(current_user.name, character_id, refresh_token))
 
     characterCard = get_character_card(character_id, preston, access_token)
-
     if characterCard is None:
         return redirect(url_for('esi_parser.index'))
 
-    # Get contact endpoints.
-    # We use labels endpoint because the normal operation id requires write access as well for some reason.
+    characterContacts = get_contacts(character_id, preston, access_token)
+    if characterContacts is None:
+        return redirect(url_for('esi_parser.index'))
+
+    # Get mail endpoint.
+    characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                    "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
+        str(character_id), access_token)).json()
+
+    # Get mailing lists.
+    characterMailingLists = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                           "https://esi.tech.ccp.is/latest/characters/{}/mail/lists/?datasource=tranquility&token={}".format(
+        str(character_id), access_token)).json()
+
+    if characterMails is not None and 'error' in characterMails:
+        return redirect(url_for('esi_parser.index'))
+
+    for mail in characterMails:
+        mail['mail'] = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
+                                                                      "https://esi.tech.ccp.is/latest/characters/{}/mail/{}/?datasource=tranquility&token={}".format(
+            str(character_id), str(mail['mail_id']), access_token)).json()
+
+        # Convert body to be easily showed in html, but first save raw body.
+        mail['mail']['raw_body'] = mail['mail']['body']
+        mailBody = mail['mail']['body'].replace('<br>', '\n')
+        mailBody = SharedInfo['util'].remove_html_tags(mailBody)
+        mail['mail']['body'] = Markup(mailBody.replace('\n', '<br>'))
+
+        # Get sender name.
+        mail['mail']['from_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+            str(mail['mail']['from']))).json()['name']
+
+        # Get recipients.
+        for recipient in mail['mail']['recipients']:
+            recipient['recipient_name'] = recipient['recipient_id']
+
+            # Determine type.
+            if recipient['recipient_type'] == 'character':
+                # Get character name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'corporation':
+                # Get corporation name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'alliance':
+                # Get alliance name.
+                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
+                    str(recipient['recipient_id']))).json()['name']
+            elif recipient['recipient_type'] == 'mailing_list':
+                # Get mailing list name.
+                for mailingList in characterMailingLists:
+                    if mailingList['mailing_list_id'] == recipient['recipient_id']:
+                        recipient['recipient_name'] = "{} [ML]".format(mailingList['name'])
+
+    return render_template('esi_parser/audit_onepage.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
+                           character=characterCard, character_contacts=characterContacts, character_mails=characterMails)
+
+
+def get_character_card(character_id, preston, access_token):
+    """Get all the info for the character card.
+
+    Args:
+        character_id (int): ID of the character.
+        preston (preston): Preston object to make scope-required ESI calls.
+        access_token (str): Access token for the scope-required ESI calls.
+
+    Returns:
+        json: Character card information.
+    """
+
+    # Get character.
+    characterPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
+    if characterPayload.status_code != 200:
+        flash('There was an error ({}) when trying to retrieve character with ID {}'.format(str(characterPayload.status_code), str(character_id)), 'danger')
+        return None
+
+    characterJSON = characterPayload.json()
+    characterJSON['portrait'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/portrait/?datasource=tranquility".format(str(character_id))).json()
+
+    # Get corporation.
+    corporationPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(characterJSON['corporation_id'])))
+    if corporationPayload.status_code != 200:
+        flash('There was an error ({}) when trying to retrieve corporation with ID {}'.format(str(corporationPayload.status_code), str(characterJSON['corporation_id'])), 'danger')
+        return None
+
+    characterJSON['corporation'] = corporationPayload.json()
+    characterJSON['corporation']['logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
+        str(characterJSON['corporation_id']))).json()
+
+    # Get alliance.
+    if 'alliance_id' in characterJSON:
+        alliancePayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(str(characterJSON['alliance_id'])))
+        if alliancePayload.status_code != 200:
+            flash('There was an error ({}) when trying to retrieve alliance with ID {}'.format(str(alliancePayload.status_code), str(characterJSON['alliance_id'])), 'danger')
+            return None
+
+        characterJSON['alliance'] = alliancePayload.json()
+        characterJSON['alliance']['logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/icons/?datasource=tranquility".format(
+            str(characterJSON['alliance_id']))).json()
+
+    # Get wallet.
+    walletIsk = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-wallet.read_character_wallet.v1'],
+                                                               "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+    walletIskJSON = walletIsk.json()
+    if walletIskJSON is not None and type(walletIskJSON) is not float:
+        flash('There was an error ({}) when trying to retrieve wallet for character.'.format(str(walletIsk.status_code)), 'danger')
+        return None
+    else:
+        characterJSON['wallet_isk'] = walletIskJSON
+
+    # Get skillpoints
+    characterSkills = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-skills.read_skills.v1'],
+                                                                     "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
+        str(character_id), access_token))
+
+    characterSkillsJSON = characterSkills.json()
+    if characterSkillsJSON is not None and 'error' in characterSkillsJSON:
+        flash('There was an error ({}) when trying to retrieve skills.'.format(str(characterSkills.status_code)), 'danger')
+        return None
+    else:
+        characterJSON['skills'] = characterSkillsJSON
+
+    return characterJSON
+
+
+def get_contacts(character_id, preston, access_token):
+    """Get all the contacts information.
+
+    Args:
+        character_id (int): ID of the character.
+        preston (preston): Preston object to make scope-required ESI calls.
+        access_token (str): Access token for the scope-required ESI calls.
+
+    Returns:
+        json: Contacts information.
+    """
+
+    # Get raw contact data.
     characterContacts = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
                                                                        "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
-        str(character_id), access_token)).json()
-    if characterContacts is not None and 'error' in characterContacts:
-        return redirect(url_for('esi_parser.index'))
+        str(character_id), access_token))
+    characterContactsJSON = characterContacts.json()
+    if characterContactsJSON is not None and 'error' in characterContactsJSON:
+        flash('There was an error ({}) when trying to retrieve contacts.'.format(str(characterContacts.status_code)), 'danger')
+        return None
 
     characterContactLabels = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
                                                                             "https://esi.tech.ccp.is/latest/characters/{}/contacts/labels/?datasource=tranquility&token={}".format(
-        str(character_id), access_token)).json()
-    if characterContactLabels is not None and 'error' in characterContactLabels:
-        return redirect(url_for('esi_parser.index'))
+        str(character_id), access_token))
+    characterContactLabelsJSON = characterContactLabels.json()
+    if characterContactLabelsJSON is not None and 'error' in characterContactLabelsJSON:
+        flash('There was an error ({}) when trying to retrieve contact labels.'.format(str(characterContactLabels.status_code)), 'danger')
+        return None
 
     # Link characters, corporations, images and labels to contacts.
-    for contact in characterContacts:
+    for contact in characterContactsJSON:
         # Name.
         if contact['contact_type'] == 'character':
             # Get character.
@@ -918,135 +1060,14 @@ def audit_onepage(character_id, client_id, client_secret, refresh_token, scopes)
 
         # Labels.
         if 'label_id' in contact:
-            for label in characterContactLabels:
+            for label in characterContactLabelsJSON:
                 if label['label_id'] == contact['label_id']:
                     contact['label_name'] = label['label_name']
 
     # Sort contacts by name.
-    characterContacts = sorted(characterContacts, key=lambda k: k['contact_name'])
+    characterContactsJSON = sorted(characterContactsJSON, key=lambda k: k['contact_name'])
 
     # Sort contacts by standings.
-    characterContacts = sorted(characterContacts, key=lambda k: k['standing'], reverse=True)
+    characterContactsJSON = sorted(characterContactsJSON, key=lambda k: k['standing'], reverse=True)
 
-    # Get mail endpoint.
-    characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
-                                                                    "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
-        str(character_id), access_token)).json()
-
-    # Get mailing lists.
-    characterMailingLists = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
-                                                                           "https://esi.tech.ccp.is/latest/characters/{}/mail/lists/?datasource=tranquility&token={}".format(
-        str(character_id), access_token)).json()
-
-    if characterMails is not None and 'error' in characterMails:
-        return redirect(url_for('esi_parser.index'))
-
-    for mail in characterMails:
-        mail['mail'] = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
-                                                                      "https://esi.tech.ccp.is/latest/characters/{}/mail/{}/?datasource=tranquility&token={}".format(
-            str(character_id), str(mail['mail_id']), access_token)).json()
-
-        # Convert body to be easily showed in html, but first save raw body.
-        mail['mail']['raw_body'] = mail['mail']['body']
-        mailBody = mail['mail']['body'].replace('<br>', '\n')
-        mailBody = SharedInfo['util'].remove_html_tags(mailBody)
-        mail['mail']['body'] = Markup(mailBody.replace('\n', '<br>'))
-
-        # Get sender name.
-        mail['mail']['from_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
-            str(mail['mail']['from']))).json()['name']
-
-        # Get recipients.
-        for recipient in mail['mail']['recipients']:
-            recipient['recipient_name'] = recipient['recipient_id']
-
-            # Determine type.
-            if recipient['recipient_type'] == 'character':
-                # Get character name.
-                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(
-                    str(recipient['recipient_id']))).json()['name']
-            elif recipient['recipient_type'] == 'corporation':
-                # Get corporation name.
-                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(
-                    str(recipient['recipient_id']))).json()['name']
-            elif recipient['recipient_type'] == 'alliance':
-                # Get alliance name.
-                recipient['recipient_name'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(
-                    str(recipient['recipient_id']))).json()['name']
-            elif recipient['recipient_type'] == 'mailing_list':
-                # Get mailing list name.
-                for mailingList in characterMailingLists:
-                    if mailingList['mailing_list_id'] == recipient['recipient_id']:
-                        recipient['recipient_name'] = "{} [ML]".format(mailingList['name'])
-
-    return render_template('esi_parser/audit_onepage.html',
-                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
-                           character=characterCard, character_contacts=characterContacts, character_mails=characterMails)
-
-
-def get_character_card(character_id, preston, access_token):
-    """Get all the info for the character card.
-
-    Args:
-        character_id (int): ID of the character.
-        preston (preston): Preston object to make scope-required ESI calls.
-        access_token (str): Access token for the scope-required ESI calls.
-
-    Returns:
-        json: Character card information.
-    """
-
-    # Get character.
-    characterPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/?datasource=tranquility".format(str(character_id)))
-    if characterPayload.status_code != 200:
-        flash('There was an error ({}) when trying to retrieve character with ID {}'.format(str(characterPayload.status_code), str(character_id)), 'danger')
-        return None
-
-    characterJSON = characterPayload.json()
-    characterJSON['portrait'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/characters/{}/portrait/?datasource=tranquility".format(str(character_id))).json()
-
-    # Get corporation.
-    corporationPayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/?datasource=tranquility".format(str(characterJSON['corporation_id'])))
-    if corporationPayload.status_code != 200:
-        flash('There was an error ({}) when trying to retrieve corporation with ID {}'.format(str(corporationPayload.status_code), str(characterJSON['corporation_id'])), 'danger')
-        return None
-
-    characterJSON['corporation'] = corporationPayload.json()
-    characterJSON['corporation']['logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/corporations/{}/icons/?datasource=tranquility".format(
-        str(characterJSON['corporation_id']))).json()
-
-    # Get alliance.
-    if 'alliance_id' in characterJSON:
-        alliancePayload = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility".format(str(characterJSON['alliance_id'])))
-        if alliancePayload.status_code != 200:
-            flash('There was an error ({}) when trying to retrieve alliance with ID {}'.format(str(alliancePayload.status_code), str(characterJSON['alliance_id'])), 'danger')
-            return None
-
-        characterJSON['alliance'] = alliancePayload.json()
-        characterJSON['alliance']['logo'] = SharedInfo['util'].make_esi_request("https://esi.tech.ccp.is/latest/alliances/{}/icons/?datasource=tranquility".format(
-            str(characterJSON['alliance_id']))).json()
-
-    # Get wallet.
-    walletIsk = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-wallet.read_character_wallet.v1'],
-                                                               "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(
-        str(character_id), access_token))
-    walletIskJSON = walletIsk.json()
-    if walletIskJSON is not None and type(walletIskJSON) is not float:
-        flash('There was an error ({}) when trying to retrieve wallet for character.'.format(str(walletIsk.status_code)), 'danger')
-        return None
-    else:
-        characterJSON['wallet_isk'] = walletIskJSON
-
-    # Get skillpoints
-    characterSkills = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-skills.read_skills.v1'],
-                                                                     "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
-        str(character_id), access_token))
-
-    characterSkillsJSON = characterSkills.json()
-    if characterSkillsJSON is not None and 'error' in characterSkillsJSON:
-        flash('There was an error ({}) when trying to retrieve skills.'.format(str(characterSkills.status_code)), 'danger')
-        return None
-    else:
-        characterJSON['skills'] = characterSkillsJSON
-
-    return characterJSON
+    return characterContactsJSON
