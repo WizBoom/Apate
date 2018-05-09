@@ -22,8 +22,11 @@ def index():
     """
 
     if request.method == 'POST':
+        scopes = request.form['scopeTextArea']
+        if scopes is '' or scopes.isspace():
+            scopes = "None"
         return redirect(url_for('esi_parser.audit_assets', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
-                                client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
+                                client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=scopes))
 
     return render_template('esi_parser/index.html')
 
@@ -865,24 +868,29 @@ def get_character_card(character_id, preston, access_token):
     walletIsk = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-wallet.read_character_wallet.v1'],
                                                                "https://esi.tech.ccp.is/latest/characters/{}/wallet/?datasource=tranquility&token={}".format(
         str(character_id), access_token))
-    walletIskJSON = walletIsk.json()
-    if walletIskJSON is not None and type(walletIskJSON) is not float:
-        flash('There was an error ({}) when trying to retrieve wallet for character.'.format(str(walletIsk.status_code)), 'danger')
-        return None
-    else:
-        characterJSON['wallet_isk'] = walletIskJSON
+
+    walletIskJSON = None
+    if walletIsk is not None:
+        walletIskJSON = walletIsk.json()
+        if walletIskJSON is not None and type(walletIskJSON) is not float:
+            flash('There was an error ({}) when trying to retrieve wallet for character.'.format(str(walletIsk.status_code)), 'danger')
+            return None
+        else:
+            characterJSON['wallet_isk'] = walletIskJSON
 
     # Get skillpoints
     characterSkills = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-skills.read_skills.v1'],
                                                                      "https://esi.tech.ccp.is/latest/characters/{}/skills/?datasource=tranquility&token={}".format(
         str(character_id), access_token))
 
-    characterSkillsJSON = characterSkills.json()
-    if characterSkillsJSON is not None and 'error' in characterSkillsJSON:
-        flash('There was an error ({}) when trying to retrieve skills.'.format(str(characterSkills.status_code)), 'danger')
-        return None
-    else:
-        characterJSON['skills'] = characterSkillsJSON
+    characterSkillsJSON = None
+    if characterSkills is not None:
+        characterSkillsJSON = characterSkills.json()
+        if characterSkillsJSON is not None and 'error' in characterSkillsJSON:
+            flash('There was an error ({}) when trying to retrieve skills.'.format(str(characterSkills.status_code)), 'danger')
+            return None
+        else:
+            characterJSON['skills'] = characterSkillsJSON
 
     return characterJSON
 
@@ -903,6 +911,10 @@ def get_contacts(character_id, preston, access_token):
     characterContacts = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-characters.read_contacts.v1'],
                                                                        "https://esi.tech.ccp.is/latest/characters/{}/contacts/?datasource=tranquility&token={}".format(
         str(character_id), access_token))
+
+    if characterContacts is None:
+        return {'has_scope': False}
+
     characterContactsJSON = characterContacts.json()
     if characterContactsJSON is not None and 'error' in characterContactsJSON:
         flash('There was an error ({}) when trying to retrieve contacts.'.format(str(characterContacts.status_code)), 'danger')
@@ -1082,6 +1094,10 @@ def get_mails(character_id, preston, access_token):
     characterMails = SharedInfo['util'].make_esi_request_with_scope(preston, ['esi-mail.read_mail.v1'],
                                                                     "https://esi.tech.ccp.is/latest/characters/{}/mail/?datasource=tranquility&token={}".format(
         str(character_id), access_token))
+
+    if characterMails is None:
+        return {'has_scope': False}
+
     characterMailsJSON = characterMails.json()
 
     if characterMailsJSON is not None and 'error' in characterMailsJSON:

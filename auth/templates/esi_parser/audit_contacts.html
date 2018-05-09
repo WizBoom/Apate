@@ -89,7 +89,7 @@
 				</div>
 			</div><br>
 				<br>
-				{% if characterContacts is not none %}
+				{% if 'has_scope' not in character_contacts %}
 				    <div class="card-deck">
 						{% for contact in character_contacts %}
 							{% if contact['standing'] > 5 %}
