@@ -60,8 +60,7 @@ class Util:
             if scope not in preston.scope:
                 return None
 
-        payload = self.make_esi_request(request_link)
-        return payload.json()
+        return self.make_esi_request(request_link)
 
     def update_character_corporation(self, character, corp_id):
         """Updates the corporation of the character. If the new
