@@ -83,7 +83,12 @@ function process(e, formID) {
 					</tr>
 					<tr>
 						<th scope="row">ESI</th>
-						<td><a href="#" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+						{% if character.refresh_token is not none %}
+							<td><a href="{{ url_for('esi_parser.audit_assets', character_id=character.id, client_id=client_id,
+                                client_secret=client_secret, refresh_token=character.refresh_token, scopes=scopes) }}" class="btn btn-outline-dark btn-sm" role="button" aria-pressed="true">ESI</a></td>
+                        {% else %}
+                        	<td>No ESI provided</td>
+                        {% endif %}
 					</tr>
 					<tr>
 						<th scope="row">Killboard</th>
