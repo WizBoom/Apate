@@ -22,16 +22,142 @@ def index():
     """
 
     if request.method == 'POST':
-        return redirect(url_for('esi_parser.audit', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
+        return redirect(url_for('esi_parser.audit_onepage', character_id=request.form['characterIDText'], client_id=request.form['clientIDText'],
                                 client_secret=request.form['clientSecretText'], refresh_token=request.form['refreshTokenText'], scopes=request.form['scopeTextArea']))
 
     return render_template('esi_parser/index.html')
 
 
-@Application.route('/audit/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@Application.route('/audit/assets/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
 @login_required
 @needs_permission('parse_esi', 'ESI Audit')
-def audit(character_id, client_id, client_secret, refresh_token, scopes):
+def audit_assets(character_id, client_id, client_secret, refresh_token, scopes):
+    return "ASSETS"
+
+
+@Application.route('/audit/bookmarks/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_bookmarks(character_id, client_id, client_secret, refresh_token, scopes):
+    return "BOOKMARKS"
+
+
+@Application.route('/audit/character/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_character(character_id, client_id, client_secret, refresh_token, scopes):
+    return "CHARACTER"
+
+
+@Application.route('/audit/clones/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_clones(character_id, client_id, client_secret, refresh_token, scopes):
+    return "CLONES"
+
+
+@Application.route('/audit/contacts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_contacts(character_id, client_id, client_secret, refresh_token, scopes):
+    return "CONTACTS"
+
+
+@Application.route('/audit/contracts/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_contracts(character_id, client_id, client_secret, refresh_token, scopes):
+    return "CONTRACTS"
+
+
+@Application.route('/audit/corporation/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_corporation(character_id, client_id, client_secret, refresh_token, scopes):
+    return "CORPORATION"
+
+
+@Application.route('/audit/fw/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_fw(character_id, client_id, client_secret, refresh_token, scopes):
+    return "FW"
+
+
+@Application.route('/audit/fittings/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_fittings(character_id, client_id, client_secret, refresh_token, scopes):
+    return "FITTINGS"
+
+
+@Application.route('/audit/industry/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_industry(character_id, client_id, client_secret, refresh_token, scopes):
+    return "INDUSTRY"
+
+
+@Application.route('/audit/location/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_location(character_id, client_id, client_secret, refresh_token, scopes):
+    return "LOCATION"
+
+
+@Application.route('/audit/lp/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_lp(character_id, client_id, client_secret, refresh_token, scopes):
+    return "LP"
+
+
+@Application.route('/audit/mail/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_mail(character_id, client_id, client_secret, refresh_token, scopes):
+    return "MAIL"
+
+
+@Application.route('/audit/market/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_market(character_id, client_id, client_secret, refresh_token, scopes):
+    return "MARKET"
+
+
+@Application.route('/audit/opportunities/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_opportunities(character_id, client_id, client_secret, refresh_token, scopes):
+    return "OPPORTUNITIES"
+
+
+@Application.route('/audit/pi/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_pi(character_id, client_id, client_secret, refresh_token, scopes):
+    return "PI"
+
+
+@Application.route('/audit/skills/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_skills(character_id, client_id, client_secret, refresh_token, scopes):
+    return "SKILLS"
+
+
+@Application.route('/audit/wallet/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_wallet(character_id, client_id, client_secret, refresh_token, scopes):
+    return "WALLET"
+
+
+@Application.route('/audit/onepage/<int:character_id>/<client_id>/<client_secret>/<refresh_token>/<scopes>')
+@login_required
+@needs_permission('parse_esi', 'ESI Audit')
+def audit_onepage(character_id, client_id, client_secret, refresh_token, scopes):
     """Views a member with ID.
 
     Args:
@@ -315,7 +441,8 @@ def audit(character_id, client_id, client_secret, refresh_token, scopes):
                     if mailingList['mailing_list_id'] == recipient['recipient_id']:
                         recipient['recipient_name'] = "{} [ML]".format(mailingList['name'])
 
-    return render_template('esi_parser/audit.html',
+    return render_template('esi_parser/audit_onepage.html',
+                           character_id=character_id, client_id=client_id, client_secret=client_secret, refresh_token=refresh_token, scopes=scopes,
                            character=characterJSON, character_portrait=characterPortrait,
                            corporation=corporationJSON, corporation_logo=corporationLogo,
                            alliance=allianceJSON, alliance_logo=allianceLogo,
